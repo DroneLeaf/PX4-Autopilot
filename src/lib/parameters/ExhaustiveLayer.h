@@ -96,6 +96,7 @@ public:
 
 	void refresh(param_t param) override
 	{
+		_parent->refresh(param);
 		// in case we don't have ownership, and it changed below, we have to refresh our cache.
 		{
 			const AtomicTransaction transaction;
@@ -104,7 +105,6 @@ public:
 				_values[param] = _parent->get(param);
 			}
 		}
-		_parent->refresh(param);
 	}
 
 	int size() const override
