@@ -107,7 +107,7 @@ static px4::AtomicBitset<param_info_count> params_unsaved;
 
 static ConstLayer firmware_defaults;
 static StaticSparseLayer<256> runtime_defaults{firmware_defaults};
-static ExhaustiveLayer user_config{runtime_defaults};
+ExhaustiveLayer user_config{runtime_defaults};
 
 /** parameter update topic handle */
 static orb_advert_t param_topic = nullptr;
