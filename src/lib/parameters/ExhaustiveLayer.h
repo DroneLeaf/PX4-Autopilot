@@ -77,6 +77,7 @@ public:
 			return {0};
 		}
 
+		const AtomicTransaction transaction;
 		// We assume to have the correct values for all params, even without ownership.
 		// We expect that refresh was called when underlying defaults changed
 		return _values[param];
