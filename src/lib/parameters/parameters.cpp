@@ -427,14 +427,14 @@ param_autosave()
 void
 param_control_autosave(bool enable)
 {
-	const AtomicTransaction transaction;
+	AtomicTransaction transaction;
+	autosave_disabled = !enable;
 
 	if (!enable && autosave_scheduled.load()) {
-		work_cancel(LPWORK, &autosave_work);
 		autosave_scheduled.store(false);
+		transaction.unlock();
+		work_cancel(LPWORK, &autosave_work);
 	}
-
-	autosave_disabled = !enable;
 }
 
 static int
