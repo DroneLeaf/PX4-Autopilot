@@ -40,7 +40,7 @@
 class ParamLayer
 {
 public:
-	static constexpr uint16_t PARAM_COUNT = sizeof(px4::parameters) / sizeof(param_info_s);
+	static constexpr param_t PARAM_COUNT = sizeof(px4::parameters) / sizeof(param_info_s);
 
 protected:
 	ParamLayer *_parent;
@@ -50,15 +50,15 @@ public:
 
 	ParamLayer() : _parent(nullptr) {}
 
-	virtual bool store(uint16_t param, param_value_u value) = 0;
+	virtual bool store(param_t param, param_value_u value) = 0;
 
-	virtual bool contains(uint16_t param) const = 0;
+	virtual bool contains(param_t param) const = 0;
 
-	virtual param_value_u get(uint16_t param) const = 0;
+	virtual param_value_u get(param_t param) const = 0;
 
-	virtual void reset(uint16_t param) = 0;
+	virtual void reset(param_t param) = 0;
 
-	virtual void refresh(uint16_t param) = 0;
+	virtual void refresh(param_t param) = 0;
 
 	virtual int size() const = 0;
 

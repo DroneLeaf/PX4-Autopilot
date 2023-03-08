@@ -42,17 +42,17 @@ public:
 
 	ConstLayer() = default;
 
-	bool store(uint16_t param, param_value_u value) override
+	bool store(param_t param, param_value_u value) override
 	{
 		return false;
 	}
 
-	bool contains(uint16_t param) const override
+	bool contains(param_t param) const override
 	{
 		return param < PARAM_COUNT;
 	}
 
-	param_value_u get(uint16_t param) const override
+	param_value_u get(param_t param) const override
 	{
 		if (param >= PARAM_COUNT) {
 			return {0};
@@ -61,12 +61,12 @@ public:
 		return px4::parameters[param].val;
 	}
 
-	void reset(uint16_t param) override
+	void reset(param_t param) override
 	{
 		// Do nothing
 	}
 
-	void refresh(uint16_t param) override
+	void refresh(param_t param) override
 	{
 		// Do nothing
 	}

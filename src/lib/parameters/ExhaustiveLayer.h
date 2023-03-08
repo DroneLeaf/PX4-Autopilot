@@ -47,12 +47,12 @@ public:
 	ExhaustiveLayer(ParamLayer &parent) : ParamLayer(parent)
 	{
 		// refresh all values
-		for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+		for (param_t i = 0; i < PARAM_COUNT; i++) {
 			_values[i] = parent.get(i);
 		}
 	}
 
-	bool store(uint16_t param, param_value_u value) override
+	bool store(param_t param, param_value_u value) override
 	{
 		if (param >= PARAM_COUNT) {
 			return false;
@@ -67,12 +67,12 @@ public:
 		return true;
 	}
 
-	bool contains(uint16_t param) const override
+	bool contains(param_t param) const override
 	{
 		return param < PARAM_COUNT && _ownership_set[param];
 	}
 
-	param_value_u get(uint16_t param) const override
+	param_value_u get(param_t param) const override
 	{
 		if (param >= PARAM_COUNT) {
 			return {0};
@@ -83,7 +83,7 @@ public:
 		return _values[param];
 	}
 
-	void reset(uint16_t param) override
+	void reset(param_t param) override
 	{
 		if (param >= PARAM_COUNT) {
 			return;
@@ -94,7 +94,7 @@ public:
 		_ownership_set.set(param, false);
 	}
 
-	void refresh(uint16_t param) override
+	void refresh(param_t param) override
 	{
 		// in case we don't have ownership, and it changed below, we have to refresh our cache.
 		{
