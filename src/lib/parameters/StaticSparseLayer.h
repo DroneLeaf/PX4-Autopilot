@@ -62,7 +62,7 @@ private:
 	int _getIndex(param_t param) const
 	{
 		int left = 0;
-		int right = N_SLOTS - 1;
+		int right = _next_slot - 1;
 
 		while (left <= right) {
 			int mid = (left + right) / 2;
@@ -78,7 +78,7 @@ private:
 			}
 		}
 
-		return N_SLOTS;
+		return _next_slot;
 	}
 
 public:
@@ -95,38 +95,38 @@ public:
 	bool store(param_t param, param_value_u value) override
 	{
 		const AtomicTransaction transaction;
+		const int index = _getIndex(param);
 
-		if (contains(param)) {
-			_slots[_getIndex(param)].value = value;
+		if (index < _next_slot) { // already exists
+			_slots[index].value = value;
 
 		} else if (_next_slot < N_SLOTS) {
 			_slots[_next_slot++] = {param, value};
+			_sort();
 
 		} else {
 			return false;
 		}
 
-		_sort();
 		return true;
 	}
 
 	bool contains(param_t param) const override
 	{
 		const AtomicTransaction transaction;
-		return _getIndex(param) < N_SLOTS;
+		return _getIndex(param) < _next_slot;
 	}
 
 	param_value_u get(param_t param) const override
 	{
 		const AtomicTransaction transaction;
-		int index = _getIndex(param);
+		const int index = _getIndex(param);
 
-		if (index < N_SLOTS) {
+		if (index < _next_slot) { // exists in this layer
 			return _slots[index].value;
-
-		} else {
-			return _parent->get(param);
 		}
+
+		return _parent->get(param);
 	}
 
 	void reset(param_t param) override
@@ -134,7 +134,7 @@ public:
 		const AtomicTransaction transaction;
 		int index = _getIndex(param);
 
-		if (index < N_SLOTS) {
+		if (index < _next_slot) {
 			_slots[index] = {UINT16_MAX, param_value_u{}};
 			_sort();
 			_next_slot--;

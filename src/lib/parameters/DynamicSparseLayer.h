@@ -162,8 +162,10 @@ public:
 		AtomicTransaction transaction;
 		Slot *slots = _slots.load();
 
-		if (contains(param)) {
-			slots[_getIndex(param)].value = value;
+		const int index = _getIndex(param);
+
+		if (index < _next_slot) { // already exists
+			slots[index].value = value;
 
 		} else if (_next_slot < _n_slots) {
 			slots[_next_slot++] = {param, value};
@@ -192,12 +194,13 @@ public:
 		const AtomicTransaction transaction;
 		Slot *slots = _slots.load();
 
-		if (contains(param)) {
-			return slots[_getIndex(param)].value;
+		const int index = _getIndex(param);
 
-		} else {
-			return _parent->get(param);
+		if (index < _next_slot) { // exists in our data structure
+			return slots[index].value;
 		}
+
+		return _parent->get(param);
 	}
 
 	void reset(param_t param) override
