@@ -31,8 +31,7 @@
  *
  ****************************************************************************/
 
-#ifndef PX4_CONSTLAYER_H
-#define PX4_CONSTLAYER_H
+#pragma once
 
 #include "ParamLayer.h"
 
@@ -81,5 +80,3 @@ public:
 		return PARAM_COUNT * sizeof(param_info_s);
 	}
 };
-
-#endif //PX4_CONSTLAYER_H

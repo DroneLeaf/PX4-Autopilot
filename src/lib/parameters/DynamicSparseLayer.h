@@ -31,8 +31,7 @@
  *
  ****************************************************************************/
 
-#ifndef PX4_DYNAMICSPARSELAYER_H
-#define PX4_DYNAMICSPARSELAYER_H
+#pragma once
 
 #include "ParamLayer.h"
 
@@ -48,7 +47,7 @@ private:
 
 	int _next_slot = 0;
 	int _n_slots = 0;
-	int _n_grow;
+	const int _n_grow;
 	px4::atomic<Slot *> _slots{nullptr};
 
 
@@ -229,5 +228,3 @@ public:
 		return _n_slots * sizeof(Slot);
 	}
 };
-
-#endif //PX4_DYNAMICSPARSELAYER_H

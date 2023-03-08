@@ -567,7 +567,6 @@ int param_set_default_value(param_t param, const void *val)
 	if (setting_to_static_default) {
 		runtime_defaults.reset(param);
 
-		// do nothing if param not already set and being set to default
 		result = PX4_OK;
 
 	} else {

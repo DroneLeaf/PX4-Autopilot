@@ -31,8 +31,7 @@
  *
  ****************************************************************************/
 
-#ifndef PX4_EXHAUSTIVELAYER_H
-#define PX4_EXHAUSTIVELAYER_H
+#pragma once
 
 #include <px4_platform_common/atomic_bitset.h>
 #include "ParamLayer.h"
@@ -59,7 +58,7 @@ public:
 		}
 
 		{
-			const AtomicTransaction _transaction;
+			const AtomicTransaction transaction;
 			_values[param] = value;
 			_ownership_set.set(param);
 		}
@@ -89,7 +88,7 @@ public:
 			return;
 		}
 
-		const AtomicTransaction _transaction;
+		const AtomicTransaction transaction;
 		_values[param] = _parent->get(param);
 		_ownership_set.set(param, false);
 	}
@@ -98,7 +97,7 @@ public:
 	{
 		// in case we don't have ownership, and it changed below, we have to refresh our cache.
 		{
-			const AtomicTransaction _transaction;
+			const AtomicTransaction transaction;
 
 			if (!contains(param)) {
 				_values[param] = _parent->get(param);
@@ -117,5 +116,3 @@ public:
 		return PARAM_COUNT * sizeof(param_value_u);
 	}
 };
-
-#endif //PX4_EXHAUSTIVELAYER_H

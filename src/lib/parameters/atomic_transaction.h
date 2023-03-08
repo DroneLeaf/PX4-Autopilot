@@ -31,8 +31,7 @@
  *
  ****************************************************************************/
 
-#ifndef PX4_ATOMIC_TRANSACTION_H
-#define PX4_ATOMIC_TRANSACTION_H
+#pragma once
 
 #ifdef __PX4_NUTTX
 #include "px4_platform_common/micro_hal.h"
@@ -104,5 +103,3 @@ public:
 #endif
 	}
 };
-
-#endif //PX4_ATOMIC_TRANSACTION_H
