@@ -452,33 +452,43 @@ param_set_internal(param_t param, const void *val, bool mark_saved, bool notify_
 
 	int result = -1;
 	bool param_changed = false;
-
+	bool param_store_success = false;
 	perf_begin(param_set_perf);
 
 	switch (param_type(param)) {
-	case PARAM_TYPE_INT32:
-		if (user_config.get(param).i != *(int32_t *)val) {
-			user_config.store(param, {.i = *(int32_t *)val});
-			param_changed = true;
+	case PARAM_TYPE_INT32: {
+			if (user_config.get(param).i != *(int32_t *)val) {
+				param_changed = true;
+			}
+
+			param_store_success = user_config.store(param, {.i = *(int32_t *)val});
+			params_unsaved.set(param, !mark_saved);
+			break;
 		}
 
-		params_unsaved.set(param, !mark_saved);
-		result = PX4_OK;
-		break;
+	case PARAM_TYPE_FLOAT: {
+			if (fabsf(user_config.get(param).f - * (float *) val) > FLT_EPSILON) {
+				param_changed = true;
+			}
 
-	case PARAM_TYPE_FLOAT:
-		if (fabsf(user_config.get(param).f - * (float *)val) > FLT_EPSILON) {
-			user_config.store(param, {.f = *(float *)val});
-			param_changed = true;
+			param_store_success = user_config.store(param, {.f = *(float *) val});
+			params_unsaved.set(param, !mark_saved);
+			result = PX4_OK;
+			break;
 		}
 
-		params_unsaved.set(param, !mark_saved);
-		result = PX4_OK;
-		break;
+	default: {
+			PX4_ERR("param_set invalid param type for %s", param_name(param));
+			break;
+		}
+	}
 
-	default:
-		PX4_ERR("param_set invalid param type for %s", param_name(param));
-		break;
+	if (!param_store_success) {
+		PX4_ERR("param_set failed to store param %s", param_name(param));
+		result = PX4_ERROR;
+
+	} else {
+		result = PX4_OK;
 	}
 
 	if ((result == PX4_OK) && param_changed && !mark_saved) { // this is false when importing parameters
@@ -571,16 +581,19 @@ int param_set_default_value(param_t param, const void *val)
 
 	} else {
 		switch (param_type(param)) {
-		case PARAM_TYPE_INT32:
-			runtime_defaults.store(param, {.i = *(int32_t *)val});
-			user_config.refresh(param);
-			result = PX4_OK;
-			break;
+		case PARAM_TYPE_INT32: {
+				const bool store_ok = runtime_defaults.store(param, {.i = *(int32_t *) val});
+				user_config.refresh(param);
+				result = store_ok ? PX4_OK : PX4_ERROR;
+				break;
+			}
 
-		case PARAM_TYPE_FLOAT:
-			runtime_defaults.store(param, {.f = *(float *)val});
-			result = PX4_OK;
-			break;
+		case PARAM_TYPE_FLOAT: {
+				const bool store_ok = runtime_defaults.store(param, {.f = *(float *) val});
+				user_config.refresh(param);
+				result = store_ok ? PX4_OK : PX4_ERROR;
+				break;
+			}
 
 		default:
 			break;
@@ -608,7 +621,7 @@ static int param_reset_internal(param_t param, bool notify = true, bool autosave
 		param_autosave();
 	}
 
-	if (notify) {
+	if (param_found && notify) {
 		param_notify_changes();
 	}
 
@@ -755,16 +768,17 @@ static int param_verify(int fd);
 int param_save_default()
 {
 	PX4_DEBUG("param_save_default");
+
+	// take the file lock
+	if (pthread_mutex_trylock(&file_mutex) != 0) {
+		PX4_ERR("param_save_default: file lock failed (already locked)");
+		return PX4_ERROR;
+	}
+
 	int shutdown_lock_ret = px4_shutdown_lock();
 
 	if (shutdown_lock_ret != 0) {
 		PX4_ERR("px4_shutdown_lock() failed (%i)", shutdown_lock_ret);
-	}
-
-	// take the file lock
-	if (pthread_mutex_trylock(&file_mutex) != 0) {
-		PX4_ERR("param_save_default: file lock failed");
-		return PX4_ERROR;
 	}
 
 	int res = PX4_ERROR;
@@ -995,7 +1009,7 @@ param_export(const char *filename, param_filter_func filter)
 
 	// take the file lock
 	if (pthread_mutex_trylock(&file_mutex) != 0) {
-		PX4_ERR("param_export: file lock failed");
+		PX4_ERR("param_export: file lock failed (already locked)");
 		return PX4_ERROR;
 	}
 
