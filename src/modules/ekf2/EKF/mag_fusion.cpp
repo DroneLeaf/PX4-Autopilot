@@ -54,7 +54,7 @@
 bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bool update_all_states)
 {
 	// XYZ Measurement uncertainty. Need to consider timing errors for fast rotations
-	const float R_MAG = sq(fmaxf(_params.mag_noise, 0.0f));
+	const float R_MAG = math::max(sq(_params.mag_noise), sq(0.01f));
 
 	// calculate intermediate variables used for X axis innovation variance, observation Jacobians and Kalman gains
 	const char* numerical_error_covariance_reset_string = "numerical error - covariance reset";
@@ -75,7 +75,12 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 		_fault_status.flags.bad_mag_x = true;
 
 		// we need to re-initialise covariances and abort this fusion step
-		resetMagRelatedCovariances();
+		if (update_all_states) {
+			resetQuatCov();
+		}
+
+		resetMagCov();
+
 		ECL_ERR("magX %s", numerical_error_covariance_reset_string);
 		return false;
 	}
@@ -88,7 +93,12 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 		_fault_status.flags.bad_mag_y = true;
 
 		// we need to re-initialise covariances and abort this fusion step
-		resetMagRelatedCovariances();
+		if (update_all_states) {
+			resetQuatCov();
+		}
+
+		resetMagCov();
+
 		ECL_ERR("magY %s", numerical_error_covariance_reset_string);
 		return false;
 	}
@@ -100,7 +110,12 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 		_fault_status.flags.bad_mag_z = true;
 
 		// we need to re-initialise covariances and abort this fusion step
-		resetMagRelatedCovariances();
+		if (update_all_states) {
+			resetQuatCov();
+		}
+
+		resetMagCov();
+
 		ECL_ERR("magZ %s", numerical_error_covariance_reset_string);
 		return false;
 	}
@@ -118,7 +133,7 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 		aid_src_mag.innovation[i] = mag_innov(i);
 	}
 
-	aid_src_mag.fusion_enabled = _control_status.flags.mag_3D && update_all_states;
+	aid_src_mag.fusion_enabled = _control_status.flags.mag;
 
 	// do not use the synthesized measurement for the magnetomter Z component for 3D fusion
 	if (_control_status.flags.synthetic_mag_z) {
@@ -159,7 +174,12 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 				_fault_status.flags.bad_mag_y = true;
 
 				// we need to re-initialise covariances and abort this fusion step
-				resetMagRelatedCovariances();
+				if (update_all_states) {
+					resetQuatCov();
+				}
+
+				resetMagCov();
+
 				ECL_ERR("magY %s", numerical_error_covariance_reset_string);
 				return false;
 			}
@@ -182,7 +202,12 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 				_fault_status.flags.bad_mag_z = true;
 
 				// we need to re-initialise covariances and abort this fusion step
-				resetMagRelatedCovariances();
+				if (update_all_states) {
+					resetQuatCov();
+				}
+
+				resetMagCov();
+
 				ECL_ERR("magZ %s", numerical_error_covariance_reset_string);
 				return false;
 			}
@@ -213,9 +238,14 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 	_fault_status.flags.bad_mag_y = !fused[1];
 	_fault_status.flags.bad_mag_z = !fused[2];
 
-	if (fused[0] && fused[1] && fused[2]) {
+	if (fused[0] && fused[1] && (fused[2] || _control_status.flags.synthetic_mag_z)) {
 		aid_src_mag.fused = true;
 		aid_src_mag.time_last_fuse = _time_delayed_us;
+
+		if (update_all_states) {
+			_time_last_heading_fuse = _time_delayed_us;
+		}
+
 		return true;
 	}
 
@@ -224,7 +254,7 @@ bool Ekf::fuseMag(const Vector3f &mag, estimator_aid_source3d_s &aid_src_mag, bo
 }
 
 // update quaternion states and covariances using the yaw innovation and yaw observation variance
-bool Ekf::fuseYaw(const float innovation, const float variance, estimator_aid_source1d_s& aid_src_status)
+bool Ekf::fuseYaw(const float innovation, const float variance, estimator_aid_source1d_s &aid_src_status)
 {
 	Vector24f H_YAW;
 	computeYawInnovVarAndH(variance, aid_src_status.innovation_variance, H_YAW);
@@ -232,7 +262,7 @@ bool Ekf::fuseYaw(const float innovation, const float variance, estimator_aid_so
 	return fuseYaw(innovation, variance, aid_src_status, H_YAW);
 }
 
-bool Ekf::fuseYaw(const float innovation, const float variance, estimator_aid_source1d_s& aid_src_status, const Vector24f &H_YAW)
+bool Ekf::fuseYaw(const float innovation, const float variance, estimator_aid_source1d_s &aid_src_status, const Vector24f &H_YAW)
 {
 	aid_src_status.innovation = innovation;
 
@@ -280,9 +310,9 @@ bool Ekf::fuseYaw(const float innovation, const float variance, estimator_aid_so
 		// we allow to use it when on the ground because the large innovation could be caused
 		// by interference or a large initial gyro bias
 		if (!_control_status.flags.in_air
-		&& isTimedOut(_time_last_in_air, (uint64_t)5e6)
-		&& isTimedOut(aid_src_status.time_last_fuse, (uint64_t)1e6)
-		) {
+		    && isTimedOut(_time_last_in_air, (uint64_t)5e6)
+		    && isTimedOut(aid_src_status.time_last_fuse, (uint64_t)1e6)
+		   ) {
 			// constrain the innovation to the maximum set by the gate
 			// we need to delay this forced fusion to avoid starting it
 			// immediately after touchdown, when the drone is still armed
@@ -331,6 +361,10 @@ void Ekf::computeYawInnovVarAndH(float variance, float &innovation_variance, Vec
 
 bool Ekf::fuseDeclination(float decl_sigma)
 {
+	if (!_control_status.flags.mag) {
+		return false;
+	}
+
 	// observation variance (rad**2)
 	const float R_DECL = sq(decl_sigma);
 
@@ -338,6 +372,7 @@ bool Ekf::fuseDeclination(float decl_sigma)
 	float innovation;
 	float innovation_variance;
 
+	// TODO: review getMagDeclination() usage, use mag_I, _mag_declination_gps, or parameter?
 	sym::ComputeMagDeclinationInnovInnovVarAndH(getStateAtFusionHorizonAsVector(), P, getMagDeclination(), R_DECL, FLT_EPSILON, &innovation, &innovation_variance, &H);
 
 	if (innovation_variance < R_DECL) {
@@ -365,22 +400,19 @@ void Ekf::limitDeclination()
 {
 	// get a reference value for the earth field declinaton and minimum plausible horizontal field strength
 	// set to 50% of the horizontal strength from geo tables if location is known
-	float decl_reference;
+	float decl_reference = math::radians(_params.mag_declination_deg);
 	float h_field_min = 0.001f;
 
-	if (_params.mag_declination_source & GeoDeclinationMask::USE_GEO_DECL) {
+	if ((_params.mag_declination_source & GeoDeclinationMask::USE_GEO_DECL)
+	&& PX4_ISFINITE(_mag_declination_gps) && PX4_ISFINITE(_mag_inclination_gps) && PX4_ISFINITE(_mag_strength_gps)
+	) {
 		// use parameter value until GPS is available, then use value returned by geo library
-		if (_NED_origin_initialised || PX4_ISFINITE(_mag_declination_gps)) {
-			decl_reference = _mag_declination_gps;
-			h_field_min = fmaxf(h_field_min, 0.5f * _mag_strength_gps * cosf(_mag_inclination_gps));
+		decl_reference = _mag_declination_gps;
+		h_field_min = fmaxf(h_field_min, 0.5f * _mag_strength_gps * cosf(_mag_inclination_gps));
 
-		} else {
-			decl_reference = math::radians(_params.mag_declination_deg);
-		}
-
-	} else {
-		// always use the parameter value
-		decl_reference = math::radians(_params.mag_declination_deg);
+	} else if (fabsf(_params.mag_declination_deg) < FLT_EPSILON) {
+		// if declination parameter is zero it was probably never set
+		return;
 	}
 
 	// do not allow the horizontal field length to collapse - this will make the declination fusion badly conditioned

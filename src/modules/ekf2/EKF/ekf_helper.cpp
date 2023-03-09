@@ -1022,35 +1022,6 @@ void Ekf::increaseQuatYawErrVariance(float yaw_variance)
 	P(3,2) -= yaw_variance*SQ[0]*SQ[3];
 }
 
-// save covariance data for re-use when auto-switching between heading and 3-axis fusion
-void Ekf::saveMagCovData()
-{
-	// save variances for XYZ body axis field
-	_saved_mag_bf_variance(0) = P(19, 19);
-	_saved_mag_bf_variance(1) = P(20, 20);
-	_saved_mag_bf_variance(2) = P(21, 21);
-
-	// save the NE axis covariance sub-matrix
-	_saved_mag_ef_ne_covmat = P.slice<2, 2>(16, 16);
-
-	// save variance for the D earth axis
-	_saved_mag_ef_d_variance = P(18, 18);
-}
-
-void Ekf::loadMagCovData()
-{
-	// re-instate variances for the XYZ body axis field
-	P(19, 19) = _saved_mag_bf_variance(0);
-	P(20, 20) = _saved_mag_bf_variance(1);
-	P(21, 21) = _saved_mag_bf_variance(2);
-
-	// re-instate the NE axis covariance sub-matrix
-	P.slice<2, 2>(16, 16) = _saved_mag_ef_ne_covmat;
-
-	// re-instate the D earth axis variance
-	P(18, 18) = _saved_mag_ef_d_variance;
-}
-
 void Ekf::resetQuatStateYaw(float yaw, float yaw_variance)
 {
 	// save a copy of the quaternion state for later use in calculating the amount of reset change
@@ -1058,18 +1029,26 @@ void Ekf::resetQuatStateYaw(float yaw, float yaw_variance)
 
 	// update transformation matrix from body to world frame using the current estimate
 	// update the rotation matrix using the new yaw value
-	_R_to_earth = updateYawInRotMat(yaw, Dcmf(_state.quat_nominal));
+	const Dcmf R_to_earth = updateYawInRotMat(yaw, Dcmf(_state.quat_nominal));
 
 	// calculate the amount that the quaternion has changed by
-	const Quatf quat_after_reset(_R_to_earth);
+	const Quatf quat_after_reset(R_to_earth);
 	const Quatf q_error((quat_after_reset * quat_before_reset.inversed()).normalized());
 
+	const float angle_error = AxisAnglef(q_error).angle();
+
+	if (angle_error < math::radians(1.f)) {
+		ECL_DEBUG("resetQuatStateYaw, skip reset (angle error %.1f deg)", (double)math::degrees(angle_error));
+		return;
+	}
+
 	// update quaternion states
+	_R_to_earth = R_to_earth;
 	_state.quat_nominal = quat_after_reset;
 	uncorrelateQuatFromOtherStates();
 
 	// update the yaw angle variance
-	if (yaw_variance > FLT_EPSILON) {
+	if (PX4_ISFINITE(yaw_variance) && (yaw_variance > FLT_EPSILON)) {
 		increaseQuatYawErrVariance(yaw_variance);
 	}
 
@@ -1093,34 +1072,27 @@ void Ekf::resetQuatStateYaw(float yaw, float yaw_variance)
 	_last_static_yaw = NAN;
 }
 
-// Resets the main Nav EKf yaw to the estimator from the EKF-GSF yaw estimator
-// Resets the horizontal velocity and position to the default navigation sensor
-// Returns true if the reset was successful
 bool Ekf::resetYawToEKFGSF()
 {
 	if (!isYawEmergencyEstimateAvailable()) {
 		return false;
 	}
 
+	// don't allow reset if there's just been a yaw reset
+	const bool yaw_alignment_changed = (_control_status_prev.flags.yaw_align != _control_status.flags.yaw_align);
+	const bool quat_reset = (_state_reset_status.reset_count.quat != _state_reset_count_prev.quat);
+
+	if (yaw_alignment_changed || quat_reset) {
+		return false;
+	}
+
+	ECL_INFO("yaw estimator reset heading %.3f -> %.3f rad",
+		 (double)getEulerYaw(_R_to_earth), (double)_yawEstimator.getYaw());
+
 	resetQuatStateYaw(_yawEstimator.getYaw(), _yawEstimator.getYawVar());
 
-	// record a magnetic field alignment event to prevent possibility of the EKF trying to reset the yaw to the mag later in flight
-	_flt_mag_align_start_time = _time_delayed_us;
 	_control_status.flags.yaw_align = true;
-
-	if (_control_status.flags.mag_hdg || _control_status.flags.mag_3D) {
-		// stop using the magnetometer in the main EKF otherwise it's fusion could drag the yaw around
-		// and cause another navigation failure
-		_control_status.flags.mag_fault = true;
-		_warning_events.flags.emergency_yaw_reset_mag_stopped = true;
-
-	} else if (_control_status.flags.gps_yaw) {
-		_control_status.flags.gps_yaw_fault = true;
-		_warning_events.flags.emergency_yaw_reset_gps_yaw_stopped = true;
-
-	} else if (_control_status.flags.ev_yaw) {
-		_inhibit_ev_yaw_use = true;
-	}
+	_information_events.flags.yaw_aligned_to_imu_gps = true;
 
 	return true;
 }

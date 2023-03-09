@@ -339,7 +339,8 @@ TEST_F(EkfFusionLogicTest, doVisionHeadingFusion)
 	EXPECT_FALSE(_ekf->local_position_is_valid());
 	EXPECT_FALSE(_ekf->global_position_is_valid());
 	// THEN: Yaw state should be reset to vision
-	EXPECT_EQ(_ekf_wrapper.getQuaternionResetCounter(), initial_quat_reset_counter + 1);
+	EXPECT_EQ(_ekf_wrapper.getQuaternionResetCounter(),
+		  initial_quat_reset_counter); // no actual reset because yaw didn't change
 
 	// WHEN: stop sending vision data
 	_sensor_simulator.stopExternalVision();
@@ -354,7 +355,8 @@ TEST_F(EkfFusionLogicTest, doVisionHeadingFusion)
 	EXPECT_FALSE(_ekf->global_position_is_valid());
 	// THEN: Yaw state shoud be reset to mag
 	EXPECT_TRUE(_ekf_wrapper.isIntendingMagHeadingFusion());
-	EXPECT_EQ(_ekf_wrapper.getQuaternionResetCounter(), initial_quat_reset_counter + 2);
+	EXPECT_EQ(_ekf_wrapper.getQuaternionResetCounter(),
+		  initial_quat_reset_counter); // no actual reset because yaw didn't change
 }
 
 TEST_F(EkfFusionLogicTest, doBaroHeightFusion)
