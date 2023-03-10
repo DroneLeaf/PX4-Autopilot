@@ -83,7 +83,7 @@ private:
 
 public:
 
-	StaticSparseLayer(ParamLayer &parent) : ParamLayer(parent)
+	StaticSparseLayer(ParamLayer *parent) : ParamLayer(parent)
 	{
 		for (int i = 0; i < N_SLOTS; i++) {
 			_slots[i] = {UINT16_MAX, param_value_u{}};

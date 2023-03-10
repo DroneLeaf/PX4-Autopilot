@@ -43,12 +43,16 @@ public:
 	static constexpr param_t PARAM_COUNT = sizeof(px4::parameters) / sizeof(param_info_s);
 
 protected:
-	ParamLayer *_parent;
+	ParamLayer *const _parent;
 
 public:
-	ParamLayer(ParamLayer &parent) : _parent(&parent) {}
+	ParamLayer(ParamLayer *parent = nullptr) : _parent(parent) {}
 
-	ParamLayer() : _parent(nullptr) {}
+	ParamLayer(const ParamLayer &) = delete;
+	ParamLayer &operator=(const ParamLayer &) = delete;
+	ParamLayer(ParamLayer &&) = delete;
+	ParamLayer &operator=(ParamLayer &&) = delete;
+
 
 	virtual bool store(param_t param, param_value_u value) = 0;
 

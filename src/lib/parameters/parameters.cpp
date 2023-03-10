@@ -106,8 +106,8 @@ static px4::AtomicBitset<param_info_count> params_active;  // params found
 static px4::AtomicBitset<param_info_count> params_unsaved;
 
 static ConstLayer firmware_defaults;
-static StaticSparseLayer<256> runtime_defaults{firmware_defaults};
-ExhaustiveLayer user_config{runtime_defaults};
+static DynamicSparseLayer runtime_defaults{&firmware_defaults};
+DynamicSparseLayer user_config{&runtime_defaults};
 
 /** parameter update topic handle */
 static orb_advert_t param_topic = nullptr;
@@ -473,7 +473,6 @@ param_set_internal(param_t param, const void *val, bool mark_saved, bool notify_
 
 			param_store_success = user_config.store(param, {.f = *(float *) val});
 			params_unsaved.set(param, !mark_saved);
-			result = PX4_OK;
 			break;
 		}
 

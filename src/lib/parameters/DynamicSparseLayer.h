@@ -132,7 +132,7 @@ private:
 	}
 
 public:
-	DynamicSparseLayer(ParamLayer &parent, int n_prealloc = 64, int n_grow = 4) : ParamLayer(parent),
+	DynamicSparseLayer(ParamLayer *parent, int n_prealloc = 32, int n_grow = 4) : ParamLayer(parent),
 		_n_slots(n_prealloc), _n_grow(n_grow)
 	{
 		Slot *slots = (Slot *)malloc(sizeof(Slot) * n_prealloc);

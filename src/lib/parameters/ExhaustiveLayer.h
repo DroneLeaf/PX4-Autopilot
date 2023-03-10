@@ -43,11 +43,11 @@ private:
 	px4::AtomicBitset<PARAM_COUNT> _ownership_set;
 
 public:
-	ExhaustiveLayer(ParamLayer &parent) : ParamLayer(parent)
+	ExhaustiveLayer(ParamLayer *parent) : ParamLayer(parent)
 	{
 		// refresh all values
 		for (param_t i = 0; i < PARAM_COUNT; i++) {
-			_values[i] = parent.get(i);
+			_values[i] = parent->get(i);
 		}
 	}
 
