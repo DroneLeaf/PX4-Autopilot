@@ -1619,7 +1619,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 
 	// FALLTHROUGH
 	case MAVLINK_MODE_EXTVISIONMIN:
-		// Note: streams requiring low latency come first
+		/*// Note: streams requiring low latency come first
 		configure_stream_local("TIMESYNC", 10.0f);
 		configure_stream_local("CAMERA_TRIGGER", unlimited_rate);
 		configure_stream_local("LOCAL_POSITION_NED", 30.0f);
@@ -1657,7 +1657,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("UTM_GLOBAL_POSITION", 1.0f);
 		configure_stream_local("VFR_HUD", 4.0f);
 		configure_stream_local("VIBRATION", 0.5f);
-		configure_stream_local("WIND_COV", 1.0f);
+		configure_stream_local("WIND_COV", 1.0f);*/
 
 #if !defined(CONSTRAINED_FLASH)
 		configure_stream_local("DEBUG", 1.0f);
@@ -1696,9 +1696,9 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 	case MAVLINK_MODE_CUSTOM:
 		//stream nothing
 		configure_stream_local("TIMESYNC", 10.0f);
-		configure_stream_local("VEHICLE_LOCAL_POSITION", 200.0f);
-		configure_stream_local("VEHICLE_ATTITUDE", 200.0f);
-		configure_stream_local("VEHICLE_ANGULAR_VELOCITY", 200.0f);
+		configure_stream_local("VEHICLE_LOCAL_POSITION", 400.0f);
+		configure_stream_local("VEHICLE_ATTITUDE", 400.0f);
+		configure_stream_local("VEHICLE_ANGULAR_VELOCITY", 400.0f);
 		configure_stream_local("VEHICLE_STATUS",2.0f);
 		configure_stream_local("VEHICLE_CONTROL_MODE",2.0f);
 		configure_stream_local("ACTUATOR_ARMED",2.0f);
@@ -1762,11 +1762,11 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("WIND_COV", 10.0f);
 		*/
 #if !defined(CONSTRAINED_FLASH)
-		configure_stream_local("DEBUG", 50.0f);
+		/*configure_stream_local("DEBUG", 50.0f);
 		configure_stream_local("DEBUG_FLOAT_ARRAY", 50.0f);
 		configure_stream_local("DEBUG_VECT", 50.0f);
 		configure_stream_local("NAMED_VALUE_FLOAT", 50.0f);
-		configure_stream_local("LINK_NODE_STATUS", 1.0f);
+		configure_stream_local("LINK_NODE_STATUS", 1.0f);*/
 #endif // !CONSTRAINED_FLASH
 
 		break;
@@ -1795,7 +1795,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 
 	case MAVLINK_MODE_ONBOARD_LOW_BANDWIDTH:
 		// Note: streams requiring low latency come first
-		configure_stream_local("TIMESYNC", 10.0f);
+		/*configure_stream_local("TIMESYNC", 10.0f);
 		configure_stream_local("CAMERA_TRIGGER", unlimited_rate);
 		configure_stream_local("LOCAL_POSITION_NED", 30.0f);
 		configure_stream_local("ATTITUDE", 20.0f);
@@ -1836,7 +1836,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("UTM_GLOBAL_POSITION", 1.0f);
 		configure_stream_local("VFR_HUD", 4.0f);
 		configure_stream_local("VIBRATION", 0.5f);
-		configure_stream_local("WIND_COV", 1.0f);
+		configure_stream_local("WIND_COV", 1.0f);*/
 
 #if !defined(CONSTRAINED_FLASH)
 		configure_stream_local("DEBUG", 1.0f);
