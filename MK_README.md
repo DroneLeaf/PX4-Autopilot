@@ -215,15 +215,29 @@ After that you should sign out and sign in again to enable the change to user pe
 chmod +x ./QGroundControl.AppImage
 ./QGroundControl.AppImage  # (or double click)
 ```
-# Configuring the MAVLink Instance
+# Setting up the Ethernet Connection
 
-1. Choose the MAVLink instance to work on `MAV_x_CONFIG`, where `x` is the instance number.
-2. In QGroundControl, search for the `MAV_x_CONFIG` parameter.
-3. Set the value of the `MAV_x_CONFIG` parameter to the port you are using (e.g., `TELEM 1`).
-4. Reboot the vehicle and relaunch QGroundControl.
-5. Set the value of the `MAV_x_MODE` parameter to `Custom`.
-6. Set the value of the `MAV_x_RATE` parameter to `2000000` B/s.
-7. Reboot the vehicle.
+1. Connect the pixhawk to QGC using a USB-C cable.
+2. Open QGroundcontrol > Analyze Tools > MAVLink Console.
+3. Enter the following commands: \
+   echo DEVICE=eth0 > /fs/microsd/net.cfg \
+                                        echo BOOTPROTO=static >> /fs/microsd/net.cfg\
+                                        echo IPADDR=10.0.0.4 >> /fs/microsd/net.cfg\
+                                        echo NETMASK=255.255.255.0 >>/fs/microsd/net.cfg\
+                                        echo ROUTER=10.0.0.1 >>/fs/microsd/net.cfg\
+                                        echo DNS=10.0.0.1 >>/fs/microsd/net.cfg\
+   The IPADDR could be chosen by the user, The router and the DNS addresses are depending on the router configurations and can be obtained under IPv4 tab in the Wi-Fi settings of the network.
+4. Connect the pixhawk to an external power source, and connect the ethernet cable to the pc.
+5. Go to network settings > Wired > settings.
+6. Go to IPv4 settings and add your IPADDR of your choising (ex: 10.0.0.6) and the NETMASK 255.255.255.0
+7. Try to ping the pixhawk ip from the terminal to ensure the connection is established.
+8. Go to params in QGC and change the following settings `MAV_x_CONFIG`, where `x` is the instance number.
+9.  In QGroundControl, search for the `MAV_x_CONFIG` parameter.
+10. Set the value of the `MAV_x_CONFIG` parameter to the port you are using (e.g., `TELEM 1`).
+11. Reboot the vehicle and relaunch QGroundControl.
+12. Set the value of the `MAV_x_MODE` parameter to `Custom`.
+13. Set the value of the `MAV_x_RATE` parameter to `2000000` B/s.
+14. Reboot the vehicle.
 
 After completing these steps, your MAVLink instance should be configured and ready to use.
 
