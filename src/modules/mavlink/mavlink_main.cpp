@@ -1547,7 +1547,10 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("TIMESYNC", 10.0f);
 		configure_stream_local("CAMERA_TRIGGER", unlimited_rate);
 		configure_stream_local("HIGHRES_IMU", 50.0f);
-		configure_stream_local("LOCAL_POSITION_NED", 30.0f);
+		configure_stream_local("LOCAL_POSITION_NED", 200.0f);
+		// configure_stream_local("VEHICLE_LOCAL_POSITION", 200.0f);
+		configure_stream_local("VEHICLE_ATTITUDE", 200.0f);
+		configure_stream_local("VEHICLE_ANGULAR_VELOCITY", 200.0f);
 		configure_stream_local("ATTITUDE", 100.0f);
 		configure_stream_local("ALTITUDE", 10.0f);
 		configure_stream_local("DISTANCE_SENSOR", 10.0f);
@@ -1696,9 +1699,10 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 	case MAVLINK_MODE_CUSTOM:
 		//stream nothing
 		configure_stream_local("TIMESYNC", 10.0f);
-		configure_stream_local("VEHICLE_LOCAL_POSITION", 200.0f);
-		configure_stream_local("VEHICLE_ATTITUDE", 200.0f);
-		configure_stream_local("VEHICLE_ANGULAR_VELOCITY", 200.0f);
+		configure_stream_local("LOCAL_POSITION_NED", 400.0f);
+		// configure_stream_local("VEHICLE_LOCAL_POSITION", 200.0f);
+		configure_stream_local("VEHICLE_ATTITUDE", 400.0f);
+		configure_stream_local("VEHICLE_ANGULAR_VELOCITY", 400.0f);
 		configure_stream_local("VEHICLE_STATUS",2.0f);
 		configure_stream_local("VEHICLE_CONTROL_MODE",2.0f);
 		configure_stream_local("ACTUATOR_ARMED",2.0f);
