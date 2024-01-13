@@ -153,7 +153,6 @@ fi
 
 param set-default BAT1_N_CELLS 4
 
-param set-default CBRK_AIRSPD_CHK 0
 param set-default CBRK_SUPPLY_CHK 894281
 
 # disable check, no CPU load reported on posix yet
@@ -186,6 +185,11 @@ param set-default SYS_FAILURE_EN 1
 # Enable low-battery actions by default for (automated) testing. Battery sim
 # does not go below 50% by default, but failure injection can trigger failsafes.
 param set-default COM_LOW_BAT_ACT 2
+
+# Allow to override SYS_MC_EST_GROUP via env
+if [ -n "$SYS_MC_EST_GROUP" ]; then
+	param set SYS_MC_EST_GROUP $SYS_MC_EST_GROUP
+fi
 
 # Adapt timeout parameters if simulation runs faster or slower than realtime.
 if [ -n "$PX4_SIM_SPEED_FACTOR" ]; then

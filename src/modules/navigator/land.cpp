@@ -58,16 +58,19 @@ Land::on_activation()
 	/* convert mission item to current setpoint */
 	struct position_setpoint_triplet_s *pos_sp_triplet = _navigator->get_position_setpoint_triplet();
 	pos_sp_triplet->previous.valid = false;
-	mission_apply_limitation(_mission_item);
 	mission_item_to_position_setpoint(_mission_item, &pos_sp_triplet->current);
 	pos_sp_triplet->next.valid = false;
-
-	_navigator->set_can_loiter_at_sp(false);
 
 	_navigator->set_position_setpoint_triplet_updated();
 
 	// reset cruising speed to default
 	_navigator->reset_cruising_speed();
+
+	// set gimbal to neutral position (level with horizon) to reduce change of damage on landing
+	_navigator->acquire_gimbal_control();
+	_navigator->set_gimbal_neutral();
+	_navigator->release_gimbal_control();
+
 }
 
 void

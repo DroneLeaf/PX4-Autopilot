@@ -9,7 +9,7 @@ pipeline {
         script {
           def build_nodes = [:]
           def docker_images = [
-            armhf: "px4io/px4-dev-armhf:2022-08-12",
+            armhf: "px4io/px4-dev-armhf:2023-06-26",
             arm64: "px4io/px4-dev-aarch64:2022-08-12",
             base: "px4io/px4-dev-ros2-foxy:2022-08-12",
             nuttx: "px4io/px4-dev-nuttx-focal:2022-08-12",
@@ -88,7 +88,10 @@ pipeline {
                      "nxp_fmuk66-e_socketcan",
                      "nxp_fmuk66-v3_default",
                      "nxp_fmuk66-v3_socketcan",
+<<<<<<< HEAD
                      "nxp_fmurt1062-v1_default",
+=======
+>>>>>>> 64f28c4c076f8bead474b19c18c3a9a6dbcaccbf
                      "nxp_mr-canhubk3_default",
                      "nxp_ucans32k146_canbootloader",
                      "nxp_ucans32k146_default",
@@ -111,13 +114,16 @@ pipeline {
                      "px4_fmu-v6c_default",
                      "px4_fmu-v6u_default",
                      "px4_fmu-v6x_default",
+                     "px4_fmu-v6xrt_bootloader",
+                     "px4_fmu-v6xrt_default",
                      "px4_io-v2_default",
                      "raspberrypi_pico_default",
                      "sky-drones_smartap-airlink_default",
                      "spracing_h7extreme_default",
                      "thepeach_k1_default",
                      "thepeach_r1_default",
-                     "uvify_core_default"
+                     "uvify_core_default",
+                     "siyi_n7_default"
             ],
             image: docker_images.nuttx,
             archive: true
@@ -169,7 +175,7 @@ pipeline {
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5', artifactDaysToKeepStr: '14'))
-    timeout(time: 90, unit: 'MINUTES')
+    timeout(time: 120, unit: 'MINUTES')
   }
 }
 

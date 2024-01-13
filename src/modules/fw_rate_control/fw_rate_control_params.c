@@ -40,6 +40,7 @@
  * @author Thomas Gubler <thomas@px4.io>
  */
 
+<<<<<<< HEAD
 /**
  * Minimum Airspeed (CAS)
  *
@@ -59,11 +60,18 @@
  */
 PARAM_DEFINE_FLOAT(FW_AIRSPD_MIN, 10.0f);
 
+=======
+>>>>>>> 64f28c4c076f8bead474b19c18c3a9a6dbcaccbf
 /**
- * Maximum Airspeed (CAS)
+ * Use airspeed for control
  *
- * The maximal airspeed (calibrated airspeed) the user is able to command.
+ * If set to 1, the airspeed measurement data, if valid, is used in the following controllers:
+ * - Rate controller: output scaling
+ * - Attitude controller: coordinated turn controller
+ * - Position controller: airspeed setpoint tracking, takeoff logic
+ * - VTOL: transition logic
  *
+<<<<<<< HEAD
  * @unit m/s
  * @min 0.5
  * @decimal 1
@@ -110,8 +118,12 @@ PARAM_DEFINE_FLOAT(FW_AIRSPD_TRIM, 15.0f);
  * @decimal 1
  * @increment 0.5
  * @group FW TECS
+=======
+ * @boolean
+ * @group FW Rate Control
+>>>>>>> 64f28c4c076f8bead474b19c18c3a9a6dbcaccbf
  */
-PARAM_DEFINE_FLOAT(FW_AIRSPD_STALL, 7.0f);
+PARAM_DEFINE_INT32(FW_USE_AIRSPD, 1);
 
 /**
  * Pitch rate proportional gain.
@@ -142,9 +154,6 @@ PARAM_DEFINE_FLOAT(FW_PR_D, 0.f);
 /**
  * Pitch rate integrator gain.
  *
- * This gain defines how much control response will result out of a steady
- * state error. It trims any constant error.
- *
  * @unit %/rad
  * @min 0.0
  * @max 10
@@ -157,9 +166,6 @@ PARAM_DEFINE_FLOAT(FW_PR_I, 0.1f);
 /**
  * Pitch rate integrator limit
  *
- * The portion of the integrator part in the control surface deflection is
- * limited to this value
- *
  * @min 0.0
  * @max 1.0
  * @decimal 2
@@ -169,7 +175,7 @@ PARAM_DEFINE_FLOAT(FW_PR_I, 0.1f);
 PARAM_DEFINE_FLOAT(FW_PR_IMAX, 0.4f);
 
 /**
- * Roll rate proportional Gain
+ * Roll rate proportional gain
  *
  * @unit %/rad/s
  * @min 0.0
@@ -181,10 +187,7 @@ PARAM_DEFINE_FLOAT(FW_PR_IMAX, 0.4f);
 PARAM_DEFINE_FLOAT(FW_RR_P, 0.05f);
 
 /**
- * Roll rate derivative Gain
- *
- * Roll rate differential gain. Small values help reduce fast oscillations.
- * If value is too big oscillations will appear again.
+ * Roll rate derivative gain
  *
  * @unit %/rad/s
  * @min 0.0
@@ -193,13 +196,10 @@ PARAM_DEFINE_FLOAT(FW_RR_P, 0.05f);
  * @increment 0.005
  * @group FW Rate Control
  */
-PARAM_DEFINE_FLOAT(FW_RR_D, 0.00f);
+PARAM_DEFINE_FLOAT(FW_RR_D, 0.0f);
 
 /**
- * Roll rate integrator Gain
- *
- * This gain defines how much control response will result out of a steady
- * state error. It trims any constant error.
+ * Roll rate integrator gain
  *
  * @unit %/rad
  * @min 0.0
@@ -211,9 +211,7 @@ PARAM_DEFINE_FLOAT(FW_RR_D, 0.00f);
 PARAM_DEFINE_FLOAT(FW_RR_I, 0.1f);
 
 /**
- * Roll integrator anti-windup
- *
- * The portion of the integrator part in the control surface deflection is limited to this value.
+ * Roll integrator limit
  *
  * @min 0.0
  * @max 1.0
@@ -238,9 +236,6 @@ PARAM_DEFINE_FLOAT(FW_YR_P, 0.05f);
 /**
  * Yaw rate derivative gain
  *
- * Yaw rate differential gain. Small values help reduce fast oscillations.
- * If value is too big oscillations will appear again.
- *
  * @unit %/rad/s
  * @min 0.0
  * @max 10
@@ -252,9 +247,6 @@ PARAM_DEFINE_FLOAT(FW_YR_D, 0.0f);
 
 /**
  * Yaw rate integrator gain
- *
- * This gain defines how much control response will result out of a steady
- * state error. It trims any constant error.
  *
  * @unit %/rad
  * @min 0.0
@@ -268,9 +260,6 @@ PARAM_DEFINE_FLOAT(FW_YR_I, 0.1f);
 /**
  * Yaw rate integrator limit
  *
- * The portion of the integrator part in the control surface deflection is
- * limited to this value
- *
  * @min 0.0
  * @max 1.0
  * @decimal 2
@@ -282,9 +271,7 @@ PARAM_DEFINE_FLOAT(FW_YR_IMAX, 0.2f);
 /**
  * Roll rate feed forward
  *
- * Direct feed forward from rate setpoint to control surface output. Use this
- * to obtain a tigher response of the controller without introducing
- * noise amplification.
+ * Direct feed forward from rate setpoint to control surface output.
  *
  * @unit %/rad/s
  * @min 0.0
@@ -324,11 +311,14 @@ PARAM_DEFINE_FLOAT(FW_PR_FF, 0.5f);
 PARAM_DEFINE_FLOAT(FW_YR_FF, 0.3f);
 
 /**
- * Acro body x max rate.
+ * Acro body roll max rate setpoint
  *
+<<<<<<< HEAD
  * This is the rate the controller is trying to achieve if the user applies full roll
  * stick input in acro mode.
  *
+=======
+>>>>>>> 64f28c4c076f8bead474b19c18c3a9a6dbcaccbf
  * @min 10
  * @max 720
  * @unit deg
@@ -337,7 +327,7 @@ PARAM_DEFINE_FLOAT(FW_YR_FF, 0.3f);
 PARAM_DEFINE_FLOAT(FW_ACRO_X_MAX, 90);
 
 /**
- * Acro body pitch max rate setpoint.
+ * Acro body pitch max rate setpoint
  *
  * @min 10
  * @max 720
@@ -347,7 +337,7 @@ PARAM_DEFINE_FLOAT(FW_ACRO_X_MAX, 90);
 PARAM_DEFINE_FLOAT(FW_ACRO_Y_MAX, 90);
 
 /**
- * Acro body yaw max rate setpoint.
+ * Acro body yaw max rate setpoint
  *
  * @min 10
  * @max 720
@@ -528,3 +518,16 @@ PARAM_DEFINE_FLOAT(FW_RLL_TO_YAW_FF, 0.0f);
  * @group FW Rate Control
  */
 PARAM_DEFINE_INT32(FW_SPOILERS_MAN, 0);
+
+/**
+ * Enable yaw rate controller in Acro
+ *
+ * If this parameter is set to 1, the yaw rate controller is enabled in Fixed-wing Acro mode.
+ * Otherwise the pilot commands directly the yaw actuator.
+ * It is disabled by default because an active yaw rate controller will fight against the
+ * natural turn coordination of the plane.
+ *
+ * @boolean
+ * @group FW Rate Control
+ */
+PARAM_DEFINE_INT32(FW_ACRO_YAW_EN, 0);

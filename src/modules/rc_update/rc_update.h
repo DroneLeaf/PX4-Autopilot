@@ -89,6 +89,7 @@ public:
 
 	int print_status() override;
 
+protected:
 	static constexpr uint64_t VALID_DATA_MIN_INTERVAL_US{1_s / 3}; // assume valid RC input is at least 3 Hz
 
 	void Run() override;
@@ -109,7 +110,7 @@ public:
 	/**
 	 * Update our local parameter cache.
 	 */
-	void		parameters_updated();
+	void updateParams() override;
 
 	/**
 	 * Get and limit value for specified RC function. Returns NAN if not mapped.
@@ -171,6 +172,7 @@ public:
 	manual_control_switches_s _manual_switches_previous{};
 	manual_control_switches_s _manual_switches_last_publish{};
 	rc_channels_s _rc{};
+	bool _rc_calibrated{false};
 
 	rc_parameter_map_s _rc_parameter_map {};
 	float _param_rc_values[rc_parameter_map_s::RC_PARAM_MAP_NCHAN] {};	/**< parameter values for RC control */

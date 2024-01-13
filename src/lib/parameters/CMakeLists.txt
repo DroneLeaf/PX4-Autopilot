@@ -156,7 +156,7 @@ add_custom_target(parameters_header DEPENDS px4_parameters.hpp)
 
 set(SRCS)
 
-list(APPEND SRCS parameters.cpp)
+list(APPEND SRCS parameters.cpp atomic_transaction.cpp autosave.cpp)
 
 if(BUILD_TESTING)
 	list(APPEND SRCS param_translation_unit_tests.cpp)
@@ -199,6 +199,10 @@ add_dependencies(parameters prebuild_targets)
 
 if(${PX4_PLATFORM} STREQUAL "nuttx")
 	target_link_libraries(parameters PRIVATE flashparams)
+endif()
+
+if(${PX4_PLATFORM} STREQUAL "posix" OR ${PX4_PLATFORM} STREQUAL "ros2")
+	target_include_directories(parameters PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../../platforms/posix/include/")
 endif()
 
 px4_add_functional_gtest(SRC ParameterTest.cpp LINKLIBS parameters)

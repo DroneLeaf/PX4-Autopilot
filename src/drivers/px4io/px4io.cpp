@@ -209,7 +209,7 @@ private:
 	bool			_timer_rates_configured{false};
 
 	/* advertised topics */
-	uORB::PublicationMulti<input_rc_s>	_to_input_rc{ORB_ID(input_rc)};
+	uORB::PublicationMulti<input_rc_s>	_input_rc_pub{ORB_ID(input_rc)};
 	uORB::Publication<px4io_status_s>	_px4io_status_pub{ORB_ID(px4io_status)};
 
 	ButtonPublisher	_button_publisher;
@@ -336,8 +336,7 @@ private:
 		(ParamInt<px4::params::RC_RSSI_PWM_MAX>) _param_rc_rssi_pwm_max,
 		(ParamInt<px4::params::RC_RSSI_PWM_MIN>) _param_rc_rssi_pwm_min,
 		(ParamInt<px4::params::SENS_EN_THERMAL>) _param_sens_en_themal,
-		(ParamInt<px4::params::SYS_HITL>) _param_sys_hitl,
-		(ParamInt<px4::params::SYS_USE_IO>) _param_sys_use_io
+		(ParamInt<px4::params::SYS_HITL>) _param_sys_hitl
 	)
 };
 
@@ -468,7 +467,7 @@ int PX4IO::init()
 	}
 
 	/* try to claim the generic PWM output device node as well - it's OK if we fail at this */
-	if (_param_sys_hitl.get() <= 0 && _param_sys_use_io.get() == 1) {
+	if (_param_sys_hitl.get() <= 0) {
 		_mixing_output.setMaxTopicUpdateRate(MIN_TOPIC_UPDATE_INTERVAL);
 	}
 
@@ -1156,7 +1155,7 @@ int PX4IO::io_publish_raw_rc()
 		input_rc.link_quality = -1;
 		input_rc.rssi_dbm = NAN;
 
-		_to_input_rc.publish(input_rc);
+		_input_rc_pub.publish(input_rc);
 	}
 
 	return ret;
@@ -1557,6 +1556,10 @@ int PX4IO::custom_command(int argc, char *argv[])
 {
 	const char *verb = argv[0];
 
+	if (!strcmp(verb, "supported")) {
+		return 0;
+	}
+
 	if (!strcmp(verb, "checkcrc")) {
 		if (is_running()) {
 			PX4_ERR("io must be stopped");
@@ -1750,6 +1753,7 @@ Output driver communicating with the IO co-processor.
 	PRINT_MODULE_USAGE_ARG("dsm2|dsmx|dsmx8", "protocol", false);
 	PRINT_MODULE_USAGE_COMMAND_DESCR("sbus1_out", "enable sbus1 out");
 	PRINT_MODULE_USAGE_COMMAND_DESCR("sbus2_out", "enable sbus2 out");
+	PRINT_MODULE_USAGE_COMMAND_DESCR("supported", "Returns 0 if px4io is supported");
 	PRINT_MODULE_USAGE_COMMAND_DESCR("test_fmu_fail", "test: turn off IO updates");
 	PRINT_MODULE_USAGE_COMMAND_DESCR("test_fmu_ok", "re-enable IO updates");
 
@@ -1762,7 +1766,7 @@ Output driver communicating with the IO co-processor.
 extern "C" __EXPORT int px4io_main(int argc, char *argv[])
 {
 	if (!PX4_MFT_HW_SUPPORTED(PX4_MFT_PX4IO)) {
-		PX4_ERR("PX4IO Not Supported");
+		PX4_INFO("PX4IO Not Supported");
 		return -1;
 	}
 	return PX4IO::main(argc, argv);

@@ -94,7 +94,7 @@ pipeline {
 
         stage('failsafe docs') {
           agent {
-            docker { image 'px4io/px4-dev-nuttx-focal:2021-08-18' }
+            docker { image 'px4io/px4-dev-nuttx-focal:2022-08-12' }
           }
           steps {
             sh '''#!/bin/bash -l
@@ -105,6 +105,7 @@ pipeline {
             ./emsdk activate latest;
             cd ..;
             . ./_emscripten_sdk/emsdk_env.sh;
+            git fetch --all --tags;
             make failsafe_web;
             cd build/px4_sitl_default_failsafe_web;
             mkdir -p failsafe_sim;
@@ -125,7 +126,7 @@ pipeline {
         stage('uORB graphs') {
           agent {
             docker {
-              image 'px4io/px4-dev-nuttx-focal:2021-08-18'
+              image 'px4io/px4-dev-nuttx-focal:2022-08-12'
               args '-e CCACHE_BASEDIR=$WORKSPACE -v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
             }
           }
@@ -230,7 +231,9 @@ pipeline {
               sh("git clone https://${GIT_USER}:${GIT_PASS}@github.com/PX4/px4_msgs.git")
               // 'main' branch
               sh('rm -f px4_msgs/msg/*.msg')
+              sh('rm -f px4_msgs/srv/*.srv')
               sh('cp msg/*.msg px4_msgs/msg/')
+              sh('cp srv/*.srv px4_msgs/srv/')
               sh('cd px4_msgs; git status; git add .; git commit -a -m "Update message definitions `date`" || true')
               sh('cd px4_msgs; git push origin main || true')
               sh('rm -rf px4_msgs')

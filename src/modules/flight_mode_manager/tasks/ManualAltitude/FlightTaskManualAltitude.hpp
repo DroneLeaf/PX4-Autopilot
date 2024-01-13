@@ -40,7 +40,6 @@
 #pragma once
 
 #include "FlightTask.hpp"
-#include <lib/mathlib/math/filter/AlphaFilter.hpp>
 #include "Sticks.hpp"
 #include "StickTiltXY.hpp"
 #include "StickYaw.hpp"
@@ -56,7 +55,6 @@ public:
 	bool update() override;
 
 protected:
-	void _updateHeadingSetpoints(); /**< sets yaw or yaw speed */
 	void _ekfResetHandlerHeading(float delta_psi) override; /**< adjust heading setpoint in case of EKF reset event */
 	virtual void _updateSetpoints(); /**< updates all setpoints */
 	virtual void _scaleSticks(); /**< scales sticks to velocity in z */
@@ -75,6 +73,10 @@ protected:
 	StickYaw _stick_yaw{this};
 
 	bool _sticks_data_required = true; ///< let inherited task-class define if it depends on stick data
+	bool _terrain_hold{false}; /**< true when vehicle is controlling height above a static ground position */
+
+	float _velocity_constraint_up{INFINITY};
+	float _velocity_constraint_down{INFINITY};
 
 	DEFINE_PARAMETERS_CUSTOM_PARENT(FlightTask,
 					(ParamFloat<px4::params::MPC_HOLD_MAX_Z>) _param_mpc_hold_max_z,
@@ -89,10 +91,6 @@ protected:
 					_param_mpc_tko_speed /**< desired upwards speed when still close to the ground */
 				       )
 private:
-	bool _isYawInput();
-	void _unlockYaw();
-	void _lockYaw();
-
 	/**
 	 * Terrain following.
 	 * During terrain following, the position setpoint is adjusted
@@ -120,9 +118,9 @@ private:
 
 	void setGearAccordingToSwitch();
 
+	bool _updateYawCorrection();
+
 	uint8_t _reset_counter = 0; /**< counter for estimator resets in z-direction */
-	bool _terrain_follow{false}; /**< true when the vehicle is following the terrain height */
-	bool _terrain_hold{false}; /**< true when vehicle is controlling height above a static ground position */
 
 	float _min_distance_to_ground{(float)(-INFINITY)}; /**< min distance to ground constraint */
 	float _max_distance_to_ground{(float)INFINITY};  /**< max distance to ground constraint */
