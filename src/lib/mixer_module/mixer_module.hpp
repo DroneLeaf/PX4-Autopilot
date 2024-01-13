@@ -206,7 +206,6 @@ public:
 
 protected:
 	void updateParams() override;
-	uint16_t output_limit_calc_single(int i, float value) const;
 
 private:
 
@@ -224,6 +223,8 @@ private:
 	void initParamHandles();
 
 	void limitAndUpdateOutputs(float outputs[MAX_ACTUATORS], bool has_updates);
+
+	uint16_t output_limit_calc_single(int i, float value) const;
 
 	void output_limit_calc(const bool armed, const int num_channels, const float outputs[MAX_ACTUATORS]);
 
@@ -249,9 +250,10 @@ private:
 
 	enum class OutputLimitState {
 		OFF = 0,
+		INIT,
 		RAMP,
 		ON
-	} _output_state{OutputLimitState::OFF};
+	} _output_state{OutputLimitState::INIT};
 
 	hrt_abstime _output_time_armed{0};
 	const bool _output_ramp_up; ///< if true, motors will ramp up from disarmed to min_output after arming

@@ -353,14 +353,9 @@ void IIM42653::ConfigureCLKIN()
 {
 	for (auto &r0 : _register_bank0_cfg) {
 		if (r0.reg == Register::BANK_0::INTF_CONFIG1) {
-<<<<<<< HEAD
 			r0.set_bits = INTF_CONFIG1_BIT::RTC_MODE;
 			r0.set_bits = INTF_CONFIG1_BIT::CLKSEL;
 			r0.clear_bits = INTF_CONFIG1_BIT::CLKSEL_CLEAR;
-=======
-			r0.set_bits = r0.set_bits | INTF_CONFIG1_BIT::RTC_MODE | INTF_CONFIG1_BIT::CLKSEL;
-			r0.clear_bits = r0.clear_bits | INTF_CONFIG1_BIT::CLKSEL_CLEAR;
->>>>>>> 64f28c4c076f8bead474b19c18c3a9a6dbcaccbf
 		}
 	}
 

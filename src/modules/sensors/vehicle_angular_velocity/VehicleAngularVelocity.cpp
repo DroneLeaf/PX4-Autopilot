@@ -79,7 +79,7 @@ bool VehicleAngularVelocity::Start()
 		return false;
 	}
 
-	if (!SensorSelectionUpdate(hrt_absolute_time(), true)) {
+	if (!SensorSelectionUpdate(true)) {
 		ScheduleNow();
 	}
 
@@ -790,8 +790,6 @@ void VehicleAngularVelocity::Run()
 
 	const hrt_abstime time_now_us = hrt_absolute_time();
 
-	ParametersUpdate();
-
 	// update corrections first to set _selected_sensor
 	const bool selection_updated = SensorSelectionUpdate(time_now_us);
 
@@ -803,8 +801,9 @@ void VehicleAngularVelocity::Run()
 		}
 	}
 
-	_calibration.SensorCorrectionsUpdate(selection_updated);
+	ParametersUpdate();
 
+	_calibration.SensorCorrectionsUpdate(selection_updated);
 	SensorBiasUpdate(selection_updated);
 
 	if (_reset_filters) {
@@ -906,7 +905,7 @@ void VehicleAngularVelocity::Run()
 
 	// force reselection on timeout
 	if (time_now_us > _last_publish + 500_ms) {
-		SensorSelectionUpdate(time_now_us, true);
+		SensorSelectionUpdate(true);
 	}
 
 	perf_end(_cycle_perf);

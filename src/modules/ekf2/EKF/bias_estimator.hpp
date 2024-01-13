@@ -47,8 +47,7 @@
  * @author Mathieu Bresciani 	<mathieu@auterion.com>
  */
 
-#ifndef EKF_BIAS_ESTIMATOR_HPP
-#define EKF_BIAS_ESTIMATOR_HPP
+#pragma once
 
 #include <matrix/math.hpp>
 #include <mathlib/mathlib.h>
@@ -134,5 +133,3 @@ private:
 	static constexpr float _innov_sequence_monitnoring_time_constant{10.f}; ///< in seconds
 	static constexpr float _process_var_boost_gain{1.0e3f};
 };
-
-#endif // !EKF_BIAS_ESTIMATOR_HPP

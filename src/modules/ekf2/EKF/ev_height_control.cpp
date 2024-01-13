@@ -56,9 +56,10 @@ void Ekf::controlEvHeightFusion(const extVisionSample &ev_sample, const bool com
 	Matrix3f pos_cov{matrix::diag(ev_sample.position_var)};
 
 	// rotate EV to the EKF reference frame unless we're operating entirely in vision frame
+	// TODO: only necessary if there's a roll/pitch offset between VIO and EKF
 	if (!(_control_status.flags.ev_yaw && _control_status.flags.ev_pos)) {
 
-		const Quatf q_error(_ev_q_error_filt.getState());
+		const Quatf q_error((_state.quat_nominal * ev_sample.quat.inversed()).normalized());
 
 		if (q_error.isAllFinite()) {
 			const Dcmf R_ev_to_ekf(q_error);
@@ -76,12 +77,10 @@ void Ekf::controlEvHeightFusion(const extVisionSample &ev_sample, const bool com
 	const float measurement = pos(2) - pos_offset_earth(2);
 	float measurement_var = math::max(pos_cov(2, 2), sq(_params.ev_pos_noise), sq(0.01f));
 
-#if defined(CONFIG_EKF2_GNSS)
 	// increase minimum variance if GPS active
 	if (_control_status.flags.gps_hgt) {
 		measurement_var = math::max(measurement_var, sq(_params.gps_pos_noise));
 	}
-#endif // CONFIG_EKF2_GNSS
 
 	const bool measurement_valid = PX4_ISFINITE(measurement) && PX4_ISFINITE(measurement_var);
 
@@ -96,7 +95,7 @@ void Ekf::controlEvHeightFusion(const extVisionSample &ev_sample, const bool com
 	if (measurement_valid && quality_sufficient) {
 		bias_est.setMaxStateNoise(sqrtf(measurement_var));
 		bias_est.setProcessNoiseSpectralDensity(_params.ev_hgt_bias_nsd);
-		bias_est.fuseBias(measurement - _state.pos(2), measurement_var + P(State::pos.idx + 2, State::pos.idx + 2));
+		bias_est.fuseBias(measurement - _state.pos(2), measurement_var + P(9, 9));
 	}
 
 	const bool continuing_conditions_passing = (_params.ev_ctrl & static_cast<int32_t>(EvCtrl::VPOS))
@@ -106,7 +105,10 @@ void Ekf::controlEvHeightFusion(const extVisionSample &ev_sample, const bool com
 			&& continuing_conditions_passing;
 
 	if (_control_status.flags.ev_hgt) {
+		aid_src.fusion_enabled = true;
+
 		if (continuing_conditions_passing) {
+
 			if (ev_reset) {
 
 				if (quality_sufficient) {
@@ -191,7 +193,7 @@ void Ekf::controlEvHeightFusion(const extVisionSample &ev_sample, const bool com
 	} else {
 		if (starting_conditions_passing) {
 			// activate fusion, only reset if necessary
-			if (_params.height_sensor_ref == static_cast<int32_t>(HeightSensor::EV)) {
+			if (_params.height_sensor_ref == HeightSensor::EV) {
 				ECL_INFO("starting %s fusion, resetting state", AID_SRC_NAME);
 				_information_events.flags.reset_hgt_to_ev = true;
 				resetVerticalPositionTo(measurement, measurement_var);

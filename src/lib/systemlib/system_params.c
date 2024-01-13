@@ -217,24 +217,13 @@ PARAM_DEFINE_INT32(SYS_HAS_MAG, 1);
 PARAM_DEFINE_INT32(SYS_HAS_BARO, 1);
 
 /**
- * Control if the vehicle has an airspeed sensor
+ * Control the number of distance sensors on the vehicle
  *
- * Set this to 0 if the board has no airspeed sensor.
- * If set to 0, the preflight checks will not check for the presence of an
- * airspeed sensor.
+ * If set to the number of distance sensors, the preflight check will check
+ * for their presence and valid data publication. Disable with 0 if no distance
+ * sensor present or to disable the preflight check.
  *
- * @group System
- * @min 0
- * @max 1
- */
-PARAM_DEFINE_INT32(SYS_HAS_NUM_ASPD, 0);
-
-/**
- * Number of distance sensors to check being available
- *
- * The preflight check will fail if fewer than this number of distance sensors with valid data is present.
- *
- * Disable the check with 0.
+ * @reboot_required true
  *
  * @group System
  * @min 0
@@ -250,9 +239,7 @@ PARAM_DEFINE_INT32(SYS_HAS_NUM_DIST, 0);
  * Note: this is only supported on boards with a separate calibration storage
  * /fs/mtd_caldata.
  *
- * @value 0 Disabled
- * @value 1 All sensors
- * @value 2 All sensors except mag
+ * @boolean
  * @group System
  */
 PARAM_DEFINE_INT32(SYS_FAC_CAL_MODE, 0);

@@ -215,11 +215,9 @@ void VehicleAcceleration::Run()
 	// update corrections first to set _selected_sensor
 	bool selection_updated = SensorSelectionUpdate();
 
-	ParametersUpdate();
-
 	_calibration.SensorCorrectionsUpdate(selection_updated);
-
 	SensorBiasUpdate(selection_updated);
+	ParametersUpdate();
 
 	// require valid sensor sample rate to run
 	if (!PX4_ISFINITE(_filter_sample_rate)) {

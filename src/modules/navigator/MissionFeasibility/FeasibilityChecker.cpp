@@ -58,6 +58,7 @@ void FeasibilityChecker::reset()
 	_land_pattern_validity_failed = false;
 	_distance_first_waypoint_failed = false;
 	_distance_between_waypoints_failed = false;
+	_below_home_alt_failed = false;
 	_fixed_wing_land_approach_failed = false;
 	_takeoff_land_available_failed = false;
 
@@ -198,12 +199,12 @@ void FeasibilityChecker::doCommonChecks(mission_item_s &mission_item, const int 
 		_distance_first_waypoint_failed = !checkHorizontalDistanceToFirstWaypoint(mission_item);
 	}
 
-	if (!_takeoff_failed) {
-		_takeoff_failed = !checkTakeoff(mission_item);
+	if (!_below_home_alt_failed) {
+		_below_home_alt_failed = !checkIfBelowHomeAltitude(mission_item, current_index);
 	}
 
-	if (!_items_fit_to_vehicle_type_failed) {
-		_items_fit_to_vehicle_type_failed = !checkItemsFitToVehicleType(mission_item);
+	if (!_takeoff_failed) {
+		_takeoff_failed = !checkTakeoff(mission_item);
 	}
 }
 
@@ -374,6 +375,7 @@ bool FeasibilityChecker::checkTakeoff(mission_item_s &mission_item)
 					     mission_item.nav_cmd != NAV_CMD_DO_SET_CAM_TRIGG_INTERVAL &&
 					     mission_item.nav_cmd != NAV_CMD_SET_CAMERA_MODE &&
 					     mission_item.nav_cmd != NAV_CMD_SET_CAMERA_ZOOM &&
+					     mission_item.nav_cmd != NAV_CMD_SET_CAMERA_FOCUS &&
 					     mission_item.nav_cmd != NAV_CMD_SET_CAMERA_FOCUS &&
 					     mission_item.nav_cmd != NAV_CMD_DO_VTOL_TRANSITION);
 	}
@@ -677,17 +679,18 @@ bool FeasibilityChecker::checkDistancesBetweenWaypoints(const mission_item_s &mi
 	return true;
 }
 
-bool FeasibilityChecker::checkItemsFitToVehicleType(const mission_item_s &mission_item)
+bool FeasibilityChecker::checkIfBelowHomeAltitude(const mission_item_s &mission_item, const int current_index)
 {
-	if (_vehicle_type != VehicleType::Vtol &&
-	    (mission_item.nav_cmd == NAV_CMD_VTOL_TAKEOFF || mission_item.nav_cmd == NAV_CMD_VTOL_LAND
-	     || mission_item.nav_cmd == NAV_CMD_DO_VTOL_TRANSITION)) {
+	/* calculate the global waypoint altitude */
+	float wp_alt = (mission_item.altitude_is_relative) ? mission_item.altitude + _home_alt_msl : mission_item.altitude;
 
-		mavlink_log_critical(_mavlink_log_pub, "Mission rejected: Mission contains VTOL items but vehicle is not a VTOL\t");
-		events::send(events::ID("navigator_mis_vtol_items"), {events::Log::Error, events::LogInternal::Info},
-			     "Mission rejected: Mission contains VTOL items but vehicle is not a VTOL");
+	if (PX4_ISFINITE(_home_alt_msl) && _home_alt_msl > wp_alt && MissionBlock::item_contains_position(mission_item)) {
 
-		return false;
+
+
+		mavlink_log_critical(_mavlink_log_pub, "Warning: Waypoint %d below home\t", current_index + 1);
+		events::send<int16_t>(events::ID("navigator_mis_wp_below_home"), {events::Log::Warning, events::LogInternal::Info},
+				      "Waypoint {1} below home", current_index + 1);
 	}
 
 	return true;

@@ -44,13 +44,13 @@
  */
 
 /**
- * Default take-off altitude
+ * Take-off altitude
  *
- * This is the relative altitude the system will take off to
- * if not otherwise specified.
+ * This is the minimum altitude the system will take off to.
  *
  * @unit m
  * @min 0
+ * @max 80
  * @decimal 1
  * @increment 0.5
  * @group Mission

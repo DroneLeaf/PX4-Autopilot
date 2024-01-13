@@ -337,10 +337,10 @@ void UavcanGnssBridge::process_fixx(const uavcan::ReceivedDataStructure<FixType>
 	 */
 	report.timestamp = hrt_absolute_time();
 
-	report.latitude_deg         = msg.latitude_deg_1e8 / 1e8;
-	report.longitude_deg        = msg.longitude_deg_1e8 / 1e8;
-	report.altitude_msl_m       = msg.height_msl_mm / 1e3;
-	report.altitude_ellipsoid_m = msg.height_ellipsoid_mm / 1e3;
+	report.lat           = msg.latitude_deg_1e8 / 10;
+	report.lon           = msg.longitude_deg_1e8 / 10;
+	report.alt           = msg.height_msl_mm;
+	report.alt_ellipsoid = msg.height_ellipsoid_mm;
 
 	if (valid_pos_cov) {
 		// Horizontal position uncertainty
@@ -497,11 +497,7 @@ void UavcanGnssBridge::handleInjectDataTopic()
 	// GPS injections should consist of 1-4 packets (GPS, Glonass, BeiDou, Galileo).
 	// Looking at 8 packets thus guarantees, that at least a full injection
 	// data set is evaluated.
-<<<<<<< HEAD
 	// Moving Base reuires a higher rate, so we allow up to 8 packets.
-=======
-	// Moving Base requires a higher rate, so we allow up to 8 packets.
->>>>>>> 64f28c4c076f8bead474b19c18c3a9a6dbcaccbf
 	const size_t max_num_injections = gps_inject_data_s::ORB_QUEUE_LENGTH;
 	size_t num_injections = 0;
 

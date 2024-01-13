@@ -106,15 +106,5 @@ void FlightTaskManualAltitudeSmoothVel::_setOutputState()
 	_jerk_setpoint(2) = _smoothing.getCurrentJerk();
 	_acceleration_setpoint(2) = _smoothing.getCurrentAcceleration();
 	_velocity_setpoint(2) = _smoothing.getCurrentVelocity();
-
-	if (!_terrain_hold) {
-		if (_terrain_hold_previous) {
-			// Reset position setpoint to current position when switching from terrain hold to non-terrain hold
-			_smoothing.setCurrentPosition(_position(2));
-		}
-
-		_position_setpoint(2) = _smoothing.getCurrentPosition();
-	}
-
-	_terrain_hold_previous = _terrain_hold;
+	_position_setpoint(2) = _smoothing.getCurrentPosition();
 }

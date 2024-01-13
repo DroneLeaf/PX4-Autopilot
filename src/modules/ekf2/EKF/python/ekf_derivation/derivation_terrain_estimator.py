@@ -33,9 +33,6 @@ File: derivation_terrain_estimator.py
 Description:
 """
 
-import symforce
-symforce.set_epsilon_to_symbol()
-
 import symforce.symbolic as sf
 from derivation_utils import *
 
@@ -46,7 +43,7 @@ def predict_opt_flow(
         pos_z: sf.Scalar,
         epsilon : sf.Scalar
 ):
-    R_to_earth = sf.Rot3(sf.Quaternion(xyz=q_att[1:4], w=q_att[0])).to_rotation_matrix()
+    R_to_earth = quat_to_rot(q_att)
     flow_pred = sf.V2()
     dist = - (pos_z - terrain_vpos)
     dist = add_epsilon_sign(dist, dist, epsilon)

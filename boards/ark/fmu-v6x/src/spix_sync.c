@@ -82,7 +82,9 @@
 #define rDMAR(_tmr)     REG(_tmr, STM32_GTIM_DMAR_OFFSET)
 #define rBDTR(_tmr)     REG(_tmr, STM32_ATIM_BDTR_OFFSET)
 
-#define BOARD_SPIX_SYNC_PWM_FREQ 1024000
+#if !defined(BOARD_PWM_FREQ)
+#define BOARD_PWM_FREQ 1000000
+#endif
 
 unsigned
 spix_sync_timer_get_period(unsigned timer)
@@ -127,11 +129,11 @@ static void spix_sync_timer_init_timer(unsigned timer, unsigned rate)
 		 * Otherwise, other frequencies are attainable by adjusting .clock_freq accordingly.
 		 */
 
-		rPSC(timer) = (spix_sync_timers[timer].clock_freq / BOARD_SPIX_SYNC_PWM_FREQ) - 1;
+		rPSC(timer) = (spix_sync_timers[timer].clock_freq / BOARD_PWM_FREQ) - 1;
 
 		/* configure the timer to update at the desired rate */
 
-		rARR(timer) = (BOARD_SPIX_SYNC_PWM_FREQ / rate) - 1;
+		rARR(timer) = (BOARD_PWM_FREQ / rate) - 1;
 
 		/* generate an update event; reloads the counter and all registers */
 		rEGR(timer) = GTIM_EGR_UG;

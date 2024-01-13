@@ -73,18 +73,12 @@ if(EXISTS ${BOARD_DEFCONFIG})
 			# Find the value
 			string(REPLACE "${Name}=" "" Value ${NameAndValue})
 
-			# remove extra quotes
-			string(REPLACE "\"" "" Value ${Value})
+			if(Value)
+				# remove extra quotes
+				string(REPLACE "\"" "" Value ${Value})
 
-			# Set the variable
-			set(${Name} ${Value} CACHE INTERNAL "BOARD DEFCONFIG: ${Name}" FORCE)
-
-		else()
-			# Find boolean not set
-			string(REGEX MATCH " (CONFIG[^ ]+) is not set" Name ${NameAndValue})
-
-			if(${CMAKE_MATCH_1})
-				set(${CMAKE_MATCH_1} "" CACHE INTERNAL "BOARD DEFCONFIG: ${CMAKE_MATCH_1}" FORCE)
+				# Set the variable
+				set(${Name} ${Value} CACHE INTERNAL "BOARD DEFCONFIG: ${Name}" FORCE)
 			endif()
 		endif()
 
@@ -222,17 +216,15 @@ if(EXISTS ${BOARD_DEFCONFIG})
 
 	endforeach()
 
-	if (CONFIG_BOARD_PROTECTED)
-	    # Put every module not in userspace also to kernel list
-	    foreach(modpath ${config_module_list})
+	# Put every module not in userspace also to kernel list
+	foreach(modpath ${config_module_list})
 		get_filename_component(module ${modpath} NAME)
 		list(FIND config_user_list ${module} _index)
 
 		if (${_index} EQUAL -1)
 			list(APPEND config_kernel_list ${modpath})
 		endif()
-	    endforeach()
-	endif()
+	endforeach()
 
 	if(PLATFORM)
 		# set OS, and append specific platform module path

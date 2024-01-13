@@ -110,7 +110,9 @@
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/vehicle_trajectory_bezier.h>
 #include <uORB/topics/vehicle_trajectory_waypoint.h>
-#include <uORB/topics/velocity_limits.h>
+#include <uORB/topics/vehicle_torque_setpoint_mode.h>
+#include <uORB/topics/vehicle_thrust_setpoint_mode.h>
+#include <uORB/topics/actuator_motors.h>
 
 #if !defined(CONSTRAINED_FLASH)
 # include <uORB/topics/debug_array.h>
@@ -177,7 +179,6 @@ private:
 	void handle_message_landing_target(mavlink_message_t *msg);
 	void handle_message_logging_ack(mavlink_message_t *msg);
 	void handle_message_manual_control(mavlink_message_t *msg);
-	void handle_message_named_value_int(mavlink_message_t *msg);
 	void handle_message_obstacle_distance(mavlink_message_t *msg);
 	void handle_message_odometry(mavlink_message_t *msg);
 	void handle_message_onboard_computer_status(mavlink_message_t *msg);
@@ -198,14 +199,14 @@ private:
 	void handle_message_trajectory_representation_bezier(mavlink_message_t *msg);
 	void handle_message_trajectory_representation_waypoints(mavlink_message_t *msg);
 	void handle_message_utm_global_position(mavlink_message_t *msg);
-#if defined(MAVLINK_MSG_ID_SET_VELOCITY_LIMITS) // For now only defined if development.xml is used
-	void handle_message_set_velocity_limits(mavlink_message_t *msg);
-#endif
 	void handle_message_vision_position_estimate(mavlink_message_t *msg);
 	void handle_message_gimbal_manager_set_attitude(mavlink_message_t *msg);
 	void handle_message_gimbal_manager_set_manual_control(mavlink_message_t *msg);
 	void handle_message_gimbal_device_information(mavlink_message_t *msg);
 	void handle_message_gimbal_device_attitude_status(mavlink_message_t *msg);
+	void handle_message_vehicle_torque_setpoint_mode(mavlink_message_t *msg);
+	void handle_message_vehicle_thrust_setpoint_mode(mavlink_message_t *msg);
+	void handle_message_actuator_motors(mavlink_message_t *msg);
 
 #if !defined(CONSTRAINED_FLASH)
 	void handle_message_debug(mavlink_message_t *msg);
@@ -258,6 +259,9 @@ private:
 	mavlink_status_t		_status{}; ///< receiver status, used for mavlink_parse_char()
 
 	orb_advert_t _mavlink_log_pub{nullptr};
+	orb_advert_t _vehicle_torque_setpoint_mode_pub{nullptr};
+	orb_advert_t _vehicle_thrust_setpoint_mode_pub{nullptr};
+	orb_advert_t _actuator_motors_pub{nullptr};
 
 	static constexpr unsigned MAX_REMOTE_COMPONENTS{16};
 	struct ComponentState {
@@ -310,7 +314,6 @@ private:
 	uORB::Publication<obstacle_distance_s>			_obstacle_distance_pub{ORB_ID(obstacle_distance)};
 	uORB::Publication<offboard_control_mode_s>		_offboard_control_mode_pub{ORB_ID(offboard_control_mode)};
 	uORB::Publication<onboard_computer_status_s>		_onboard_computer_status_pub{ORB_ID(onboard_computer_status)};
-	uORB::Publication<velocity_limits_s>			_velocity_limits_pub{ORB_ID(velocity_limits)};
 	uORB::Publication<generator_status_s>			_generator_status_pub{ORB_ID(generator_status)};
 	uORB::Publication<vehicle_attitude_s>			_attitude_pub{ORB_ID(vehicle_attitude)};
 	uORB::Publication<vehicle_attitude_setpoint_s>		_att_sp_pub{ORB_ID(vehicle_attitude_setpoint)};
@@ -341,7 +344,7 @@ private:
 	uORB::PublicationMulti<radio_status_s>			_radio_status_pub{ORB_ID(radio_status)};
 	uORB::PublicationMulti<sensor_baro_s>			_sensor_baro_pub{ORB_ID(sensor_baro)};
 	uORB::PublicationMulti<sensor_gps_s>			_sensor_gps_pub{ORB_ID(sensor_gps)};
-	uORB::PublicationMulti<sensor_optical_flow_s>           _sensor_optical_flow_pub{ORB_ID(sensor_optical_flow)};
+	uORB::PublicationMulti<sensor_optical_flow_s>         _sensor_optical_flow_pub{ORB_ID(sensor_optical_flow)};
 
 	// ORB publications (queue length > 1)
 	uORB::Publication<transponder_report_s>  _transponder_report_pub{ORB_ID(transponder_report)};
