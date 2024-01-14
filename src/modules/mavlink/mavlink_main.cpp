@@ -1694,6 +1694,17 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 	/* fallthrough */
 	case MAVLINK_MODE_CUSTOM:
 		//stream nothing
+		configure_stream_local("TIMESYNC", 10.0f);
+		configure_stream_local("LOCAL_POSITION_NED", 400.0f);
+		configure_stream_local("VEHICLE_LOCAL_POSITION", 400.0f);
+		configure_stream_local("VEHICLE_ATTITUDE", 400.0f);
+		configure_stream_local("VEHICLE_ANGULAR_VELOCITY", 400.0f);
+		configure_stream_local("VEHICLE_STATUS",2.0f);
+		configure_stream_local("VEHICLE_CONTROL_MODE",2.0f);
+		configure_stream_local("ACTUATOR_ARMED",2.0f);
+		configure_stream_local("POSITION_TARGET_LOCAL_NED", 400.0f);
+		configure_stream_local("HIGHRES_IMU", 400.0f);
+		// configure_stream_local("ACTUATOR_OUTPUTS",100.0f);
 		break;
 
 	case MAVLINK_MODE_CONFIG: // USB
