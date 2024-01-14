@@ -1,4 +1,3 @@
-
 #ifndef ACTUATOR_ARMED_HPP
 #define ACTUATOR_ARMED_HPP
 
