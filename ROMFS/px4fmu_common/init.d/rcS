@@ -41,6 +41,8 @@ set VEHICLE_TYPE none
 #
 ver all
 
+sleep 10 #sleep is added to allow companion computers connected through uart to boot properly
+
 #
 # Try to mount the microSD card.
 #

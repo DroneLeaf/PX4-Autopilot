@@ -51,7 +51,7 @@ fi
 #
 # Start Control Allocator
 #
-control_allocator start
+# control_allocator start
 
 #
 # Start Multicopter Rate Controller.

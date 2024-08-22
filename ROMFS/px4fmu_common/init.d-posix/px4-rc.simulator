@@ -210,4 +210,28 @@ else
 		simulator_mavlink start -h "${PX4_SIM_HOSTNAME}" "${simulator_tcp_port}"
 	fi
 
+	# param set-default SYS_AUTOSTART 3011 #TODO This should be ready from the user
+
+	# param set-default EKF2_HGT_REF 3
+	# param set-default EKF2_GPS_CTRL 0
+	# param set-default EKF2_MAG_TYPE 5
+	# param set-default EKF2_BARO_CTRL 0
+	# param set-default EKF2_RNG_CTRL 0
+
+	param set SYS_AUTOSTART 3011 #TODO This should be ready from the user
+
+	param set EKF2_HGT_REF 3
+	param set EKF2_GPS_CTRL 0
+	param set EKF2_BARO_CTRL 0
+	param set EKF2_RNG_CTRL 0
+	param set EKF2_MAG_TYPE 5
+
+	param set-default MC_ROLLRATE_P 0.1
+	param set-default MC_ROLLRATE_I 0.0
+	param set-default MC_ROLLRATE_D 0.0
+
+	param set-default MC_PITCHRATE_P 0.1
+	param set-default MC_PITCHRATE_I 0.0
+	param set-default MC_PITCHRATE_D 0.0
+
 fi

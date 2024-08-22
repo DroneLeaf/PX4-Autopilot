@@ -2,4 +2,22 @@
 # shellcheck disable=SC2154
 
 #param set-default MAV_SYS_ID $((px4_instance+1))
-#param set-default IMU_INTEG_RATE 250
+param set-default IMU_INTEG_RATE 400
+param set-default EKF2_PREDICT_US 2500
+
+# param set-default EKF2_HGT_REF 3
+# param set-default EKF2_GPS_CTRL 0
+# param set-default EKF2_BARO_CTRL 0
+# param set-default EKF2_RNG_CTRL 0
+# param set-default EKF2_MAG_TYPE 5
+
+# param set EKF2_GPS_CTRL 0
+# param set EKF2_BARO_CTRL 0
+# param set EKF2_RNG_CTRL 0
+# param set EKF2_MAG_TYPE 5
+
+param set-default COM_DISARM_PRFLT 1000
+
+param set-default COM_DISARM_LAND  -1
+param set-default MPC_THR_HOVER  0.25
+

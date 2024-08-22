@@ -143,8 +143,9 @@ void getVehicleControlMode(bool armed, uint8_t nav_state, uint8_t vehicle_type,
 
 		} else if (offboard_control_mode.body_rate) {
 			vehicle_control_mode.flag_control_rates_enabled = true;
+		} else if (offboard_control_mode.actuator) {
+			vehicle_control_mode.flag_control_manual_enabled = true;
 		}
-
 		break;
 
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_FOLLOW_TARGET:

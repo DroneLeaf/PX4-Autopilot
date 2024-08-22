@@ -69,6 +69,12 @@ px4_add_romfs_files(
 	4500_clover4
 	4900_crazyflie
 	4901_crazyflie21
+	4951_hear_quad_ethernet_indoor
+	4952_hear_quad_telem_indoor
+	4953_hear_octa_ethernet_indoor
+	4954_hear_octa_telem_indoor
+	4955_hear_quad_ethernet_gps
+	4956_hear_quad_ethernet_rtk
 
 	# [5000, 5999] Quadrotor +"
 	5001_quad_+
@@ -121,7 +127,7 @@ px4_add_romfs_files(
 	50003_aion_robotics_r1_rover
 
 	# [60000, 61000] (Unmanned) Underwater Robots
-	60000_uuv_generic
-	60001_uuv_hippocampus
-	60002_uuv_bluerov2_heavy
+	# 60000_uuv_generic
+	# 60001_uuv_hippocampus
+	# 60002_uuv_bluerov2_heavy
 )
