@@ -12,6 +12,8 @@ then
 	mv $PARAM_FILE ${PARAM_FILE}.bak
 	reboot
 fi
+param set-default MODAL_IO_BAUD 250000
+param set-default MODAL_IO_CONFIG 1
 
 param set-default BAT1_V_DIV 11.2
 param set-default BAT1_A_PER_V 59.5

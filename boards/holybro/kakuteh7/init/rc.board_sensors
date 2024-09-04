@@ -12,3 +12,8 @@ then
 fi
 
 bmp280 -X start
+
+if param greater MODAL_IO_CONFIG 0
+then
+	modal_io start
+fi

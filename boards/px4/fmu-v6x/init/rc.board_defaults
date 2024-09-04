@@ -18,3 +18,7 @@ param set-default SENS_EN_INA226 1
 
 
 safety_button start
+
+
+param set-default MODAL_IO_BAUD 250000
+param set-default MODAL_IO_CONFIG 1

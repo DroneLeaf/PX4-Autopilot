@@ -149,3 +149,8 @@ fi
 ms5611 -X start
 
 unset HAVE_PM2
+
+if param greater MODAL_IO_CONFIG 0
+then
+	modal_io start
+fi
