@@ -26,7 +26,7 @@ param set-default EKF2_GPS_CTRL 0
 param set-default EKF2_BARO_CTRL 0
 param set-default EKF2_RNG_CTRL 0
 param set-default EKF2_MAG_TYPE 5
-param set-default EKF2_EV_TYPE 15
+param set-default EKF2_EV_CTRL 15
 
 param set-default COM_DISARM_PRFLT 1000.00
 
