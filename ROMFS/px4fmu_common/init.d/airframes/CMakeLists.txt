@@ -75,7 +75,7 @@ px4_add_romfs_files(
 	4954_hear_octa_telem_indoor
 	4955_hear_quad_ethernet_gps
 	4956_hear_quad_ethernet_rtk
-
+	4999_snono_vtol
 	# [5000, 5999] Quadrotor +"
 	5001_quad_+
 
@@ -105,7 +105,6 @@ px4_add_romfs_files(
 	13014_vtol_babyshark
 	13030_generic_vtol_quad_tiltrotor
 	13200_generic_vtol_tailsitter
-
 	# [14000, 14999] MC with tilt
 	14001_generic_mc_with_tilt
 
