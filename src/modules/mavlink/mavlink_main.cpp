@@ -1593,7 +1593,7 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 
 	/* fallthrough */
 	case MAVLINK_MODE_CUSTOM:
-		//stream nothing
+		//stream for control
 		configure_stream_local("TIMESYNC", 10.0f);
 		configure_stream_local("LOCAL_POSITION_NED", 200.0f);
 		configure_stream_local("VEHICLE_LOCAL_POSITION", 200.0f);
@@ -1607,7 +1607,26 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("ATTITUDE", 200.0f);
 		configure_stream_local("RC_CHANNELS", 200.0f);
 		// configure_stream_local("ACTUATOR_OUTPUTS",100.0f);
+		// Additional for GPS
+		configure_stream_local("GLOBAL_POSITION_INT", 5.0f);
+		configure_stream_local("GPS2_RAW", 20.0f);
 		configure_stream_local("GPS_GLOBAL_ORIGIN", 1.0f);
+		configure_stream_local("GPS_RAW_INT", 20.0f);
+		configure_stream_local("GPS_STATUS", 1.0);
+
+		// Additional for battery
+		configure_stream_local("BATTERY_STATUS", 0.5f);
+
+		// Additional for PX4 status
+		configure_stream_local("ESTIMATOR_STATUS", 0.5f);
+		configure_stream_local("EXTENDED_SYS_STATE", 1.0f);
+		configure_stream_local("SYS_STATUS", 1.0f);
+
+		// Additional for gimbal
+		configure_stream_local("GIMBAL_DEVICE_ATTITUDE_STATUS", 1.0f);
+		configure_stream_local("GIMBAL_DEVICE_SET_ATTITUDE", 5.0f);
+		configure_stream_local("GIMBAL_MANAGER_STATUS", 0.5f);
+
 		break;
 
 	case MAVLINK_MODE_CONFIG: // USB
