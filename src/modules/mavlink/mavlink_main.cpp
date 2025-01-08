@@ -1627,6 +1627,15 @@ Mavlink::configure_streams_to_default(const char *configure_single_stream)
 		configure_stream_local("GIMBAL_DEVICE_SET_ATTITUDE", 5.0f);
 		configure_stream_local("GIMBAL_MANAGER_STATUS", 0.5f);
 
+		// Additional for sensors validity check
+		configure_stream_local("SCALED_IMU",  1.0f);
+		configure_stream_local("SCALED_IMU2", 1.0f);
+		configure_stream_local("SCALED_IMU3", 1.0f);
+
+		// Additional for optical flow validity checks and data
+		configure_stream_local("OPTICAL_FLOW_RAD", 1.0f);
+
+
 		break;
 
 	case MAVLINK_MODE_CONFIG: // USB
