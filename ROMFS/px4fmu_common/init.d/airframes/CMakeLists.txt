@@ -75,7 +75,8 @@ px4_add_romfs_files(
 	4954_hear_octa_telem_indoor
 	4955_hear_quad_ethernet_gps
 	4956_hear_quad_ethernet_rtk
-
+	4970_hear_rc_raw_forwarder
+	4999_snono_vtol
 	# [5000, 5999] Quadrotor +"
 	5001_quad_+
 
@@ -105,7 +106,6 @@ px4_add_romfs_files(
 	13014_vtol_babyshark
 	13030_generic_vtol_quad_tiltrotor
 	13200_generic_vtol_tailsitter
-
 	# [14000, 14999] MC with tilt
 	14001_generic_mc_with_tilt
 
@@ -121,6 +121,13 @@ px4_add_romfs_files(
 	# [22000, 22999] Reserve for custom models
 
 	24001_dodeca_cox
+
+	# [49000, 49999] Redundant drones
+	49511_hear_quad_ethernet_indoor_red_1
+	49512_hear_quad_ethernet_indoor_red_2
+	49513_hear_quad_ethernet_indoor_red_3
+
+	# [22000, 22999] Reserve for custom models
 
 	50000_generic_ground_vehicle
 	50004_nxpcup_car_dfrobot_gpx
