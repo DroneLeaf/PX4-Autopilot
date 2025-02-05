@@ -1981,11 +1981,11 @@ void Commander::landDetectorUpdate()
 		// Only take actions if armed
 		if (_arm_state_machine.isArmed()) {
 			if (!was_landed && _vehicle_land_detected.landed) {
-				mavlink_log_info(&_mavlink_log_pub, "Landing detected\t");
+				// mavlink_log_info(&_mavlink_log_pub, "Landing detected\t");
 				events::send(events::ID("commander_landing_detected"), events::Log::Info, "Landing detected");
 
 			} else if (was_landed && !_vehicle_land_detected.landed) {
-				mavlink_log_info(&_mavlink_log_pub, "Takeoff detected\t");
+				// mavlink_log_info(&_mavlink_log_pub, "Takeoff detected\t");
 				events::send(events::ID("commander_takeoff_detected"), events::Log::Info, "Takeoff detected");
 				_vehicle_status.takeoff_time = hrt_absolute_time();
 				_have_taken_off_since_arming = true;
