@@ -3,7 +3,7 @@ param set-default MAV_2_CONFIG 1000           # MAVLink instance 2 configuration
 param set-default MAV_2_FLOW_CTRL 2           # MAVLink flow control mode (2 = Auto-detected)
 param set-default MAV_2_FORWARD 0             # MAVLink forwarding (0 = disabled)
 param set-default MAV_2_RATE 2000000          # MAVLink data rate (bits per second)
-param set-default MAV_2_BROADCAST 1           # MAVLink broadcast mode (1 = enabled)
+param set-default MAV_2_BROADCAST 0           # MAVLink broadcast mode (1 = enabled)
 param set-default MAV_2_RADIO_CTL 0           # MAVLink radio control (0 = disabled)
 param set-default MAV_2_REMOTE_PRT 14560      # MAVLink remote port for UDP communication
 param set-default MAV_2_UDP_PRT 14541         # MAVLink local UDP port
