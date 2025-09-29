@@ -50,6 +50,7 @@
 #include "MavlinkStatustextHandler.hpp"
 #include "mavlink_timesync.h"
 #include "tune_publisher.h"
+#include <px4_platform_common/events.h>
 
 #include <geo/geo.h>
 #include <lib/drivers/accelerometer/PX4Accelerometer.hpp>
@@ -81,6 +82,7 @@
 #include <uORB/topics/input_rc.h>
 #include <uORB/topics/irlock_report.h>
 #include <uORB/topics/landing_target_pose.h>
+#include <uORB/topics/leaf_health_events.h>
 #include <uORB/topics/log_message.h>
 #include <uORB/topics/manual_control_setpoint.h>
 #include <uORB/topics/mavlink_tunnel.h>
@@ -113,6 +115,7 @@
 #include <uORB/topics/vehicle_torque_setpoint_mode.h>
 #include <uORB/topics/vehicle_thrust_setpoint_mode.h>
 #include <uORB/topics/actuator_motors.h>
+#include <uORB/topics/event.h>
 
 #if !defined(CONSTRAINED_FLASH)
 # include <uORB/topics/debug_array.h>
@@ -207,6 +210,7 @@ private:
 	void handle_message_vehicle_torque_setpoint_mode(mavlink_message_t *msg);
 	void handle_message_vehicle_thrust_setpoint_mode(mavlink_message_t *msg);
 	void handle_message_actuator_motors(mavlink_message_t *msg);
+	void handle_message_event(mavlink_message_t *msg);
 
 #if !defined(CONSTRAINED_FLASH)
 	void handle_message_debug(mavlink_message_t *msg);
@@ -327,6 +331,7 @@ private:
 	uORB::Publication<vehicle_rates_setpoint_s>		_rates_sp_pub{ORB_ID(vehicle_rates_setpoint)};
 	uORB::Publication<vehicle_trajectory_bezier_s>		_trajectory_bezier_pub{ORB_ID(vehicle_trajectory_bezier)};
 	uORB::Publication<vehicle_trajectory_waypoint_s>	_trajectory_waypoint_pub{ORB_ID(vehicle_trajectory_waypoint)};
+	uORB::Publication<leaf_health_events_s> 		_leaf_health_pub{ORB_ID(leaf_health_events)};
 
 #if !defined(CONSTRAINED_FLASH)
 	uORB::Publication<debug_array_s>			_debug_array_pub {ORB_ID(debug_array)};

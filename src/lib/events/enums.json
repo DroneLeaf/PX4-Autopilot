@@ -240,6 +240,10 @@
                         "536870912": {
                             "name": "gyro",
                             "description": "Gyroscope"
+                        },
+                        "1073741824": {
+                            "name": "leaf",
+                            "description": "Leaf"
                         }
                     }
                 },

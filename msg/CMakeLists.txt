@@ -114,6 +114,7 @@ set(msg_files
 	LandingTargetInnovations.msg
 	LandingTargetPose.msg
 	LaunchDetectionStatus.msg
+	LeafHealthEvents.msg
 	LedControl.msg
 	LoggerStatus.msg
 	LogMessage.msg

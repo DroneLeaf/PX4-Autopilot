@@ -323,6 +323,9 @@ MavlinkReceiver::handle_message(mavlink_message_t *msg)
 	case MAVLINK_MSG_ID_GIMBAL_DEVICE_ATTITUDE_STATUS:
 		handle_message_gimbal_device_attitude_status(msg);
 		break;
+	case MAVLINK_MSG_ID_EVENT:
+		handle_message_event(msg);
+		break;
 
 	default:
 		break;
@@ -3150,6 +3153,29 @@ MavlinkReceiver::handle_message_gimbal_device_attitude_status(mavlink_message_t 
 	gimbal_attitude_status.received_from_mavlink = true;
 
 	_gimbal_device_attitude_status_pub.publish(gimbal_attitude_status);
+}
+
+void MavlinkReceiver::handle_message_event(mavlink_message_t *msg)
+{
+	mavlink_event_t in{};
+	mavlink_msg_event_decode(msg, &in);
+
+	// Only accept if addressed to system=1, component=1
+	if (in.destination_system != 1 || in.destination_component != 1) {
+		return;
+	}
+
+
+	leaf_health_events_s le{};
+	le.timestamp       = hrt_absolute_time();
+	le.remote_event_id = in.id;
+	le.ext_severity    = (uint8_t)(in.log_levels & 0x0F);      // external sev (0..7)
+	static_assert(sizeof(le.arguments) <= sizeof(in.arguments), "size mismatch");
+	memcpy(le.arguments, in.arguments, sizeof(le.arguments));  // take first 5 bytes
+
+	_leaf_health_pub.publish(le);
+
+	PX4_INFO("Leaf MAVLink event received %" PRIu8,in.arguments[0]);
 }
 
 void

@@ -50,11 +50,139 @@ HealthAndArmingChecks::HealthAndArmingChecks(ModuleParams *parent, vehicle_statu
 	_failsafe_flags.home_position_invalid = true;
 }
 
+events::Log HealthAndArmingChecks::map_ext_to_log(uint8_t ext)
+{
+    switch (ext & 0x0F) {
+    case 0: return events::Log::Emergency;
+    case 1: return events::Log::Alert;
+    case 2: return events::Log::Critical;
+    case 3: return events::Log::Error;
+    case 4: return events::Log::Warning;
+    case 5: return events::Log::Notice;
+    case 6: return events::Log::Info;
+    default: return events::Log::Debug;
+    }
+}
+
+// avoid the "unmatched events::ID(" assertion by breaking the literal pattern
+#define LEAF_EVID(name) events::ID/**/(name)
+void HealthAndArmingChecks::checkLeafHealth(Report &reporter)
+{
+
+
+    // Consider it "active" if a message arrived recently (e.g., in last 2 s)
+
+        const events::Log sev = HealthAndArmingChecks::map_ext_to_log(_leaf_last.ext_severity);
+
+	switch (_leaf_last.remote_event_id)
+	{
+		case LEAF_EVID("optitrack_stream_lost"):
+			// PX4_INFO("Leaf optitrack_stream_lost %" PRIu8,_leaf_last.arguments[0]);
+			leafEventSet[0]=_leaf_last.arguments[0];
+			break;
+
+		case LEAF_EVID("misconfigured_esc"):
+			// PX4_INFO("Leaf misconfigured_esc %" PRIu8,_leaf_last.arguments[0]);
+			leafEventSet[1]=_leaf_last.arguments[0];
+			break;
+
+		case LEAF_EVID("misconfigured_geometry"):
+			// PX4_INFO("Leaf misconfigured_geometry %" PRIu8,_leaf_last.arguments[0]);
+			leafEventSet[2]=_leaf_last.arguments[0];
+			break;
+
+		case LEAF_EVID("misconfigured_rc"):
+			// PX4_INFO("Leaf misconfigured_rc %" PRIu8,_leaf_last.arguments[0]);
+			leafEventSet[3]=_leaf_last.arguments[0];
+			break;
+
+		default:
+			break;
+
+	}
+
+	if (leafEventSet[0])
+	{
+		/* EVENT
+		* @description
+		* Lost OptiTrack Stream. See <a href="https://fly.droneleaf.io/">OptiTrack Website</a>
+		*/
+		reporter.armingCheckFailure(
+		NavModes::All,                   // affect all nav modes; tailor if needed
+		health_component_t::leaf,        // your custom component
+		events::ID("optitrack_stream_lost"),
+		sev,
+		"OptiTrack Stream Lost"
+		);
+	}
+	if (leafEventSet[1])
+	{
+		/* EVENT
+		* @description
+		* Motors are not configured properly. See <a href="https://fly.droneleaf.io/">ESCs Workflow</a>
+		*/
+		reporter.armingCheckFailure(
+		NavModes::All,                   // affect all nav modes; tailor if needed
+		health_component_t::leaf,        // your custom component
+		events::ID("misconfigured_esc"),
+		sev,
+		"Motors not configured properly"
+		);
+	}
+
+	if (leafEventSet[2])
+	{
+		/* EVENT
+		* @description
+		* Drone geometry is not configured properly. See <a href="https://fly.droneleaf.io/">Geometry Workflow</a>
+		*/
+		reporter.armingCheckFailure(
+		NavModes::All,                   // affect all nav modes; tailor if needed
+		health_component_t::leaf,        // your custom component
+		events::ID("misconfigured_geometry"),
+		sev,
+		"Geometry not configured properly"
+		);
+	}
+
+	if (leafEventSet[3])
+	{
+		/* EVENT
+		* @description
+		* Drone RC is not configured properly. See <a href="https://fly.droneleaf.io/">RC Workflow</a>
+		*/
+		reporter.armingCheckFailure(
+		NavModes::All,                   // affect all nav modes; tailor if needed
+		health_component_t::leaf,        // your custom component
+		events::ID("misconfigured_rc"),
+		sev,
+		"RC not configured properly"
+		);
+	}
+
+	// Drain any new messages; keep the most recent
+	leaf_health_events_s le{};
+	//     while (_leaf_health_sub.update(&le)) {
+	//         _leaf_last = le;
+	//         _leaf_last_ts = le.timestamp;
+	//     }
+	if (!_leaf_health_sub.update(&le)){
+		return;
+	}
+	_leaf_last=le;
+}
+
+
+
 bool HealthAndArmingChecks::update(bool force_reporting)
 {
 	_reporter.reset();
 
 	_reporter.prepare(_context.status().vehicle_type);
+
+	if (!_context.isArmed()){
+		checkLeafHealth(_reporter);
+	}
 
 	for (unsigned i = 0; i < sizeof(_checks) / sizeof(_checks[0]); ++i) {
 		if (!_checks[i]) {
@@ -77,6 +205,10 @@ bool HealthAndArmingChecks::update(bool force_reporting)
 		_reporter.reset();
 
 		_reporter.prepare(_context.status().vehicle_type);
+
+		if (!_context.isArmed()){
+			checkLeafHealth(_reporter);
+		}
 
 		for (unsigned i = 0; i < sizeof(_checks) / sizeof(_checks[0]); ++i) {
 			if (!_checks[i]) {
