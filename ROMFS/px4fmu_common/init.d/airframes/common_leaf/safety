@@ -2,4 +2,4 @@ param set-default COM_DISARM_LAND -1.0        # Disarm timeout after landing (-1
 param set-default COM_DISARM_PRFLT -1.0f      # Preflight disarm timeout (-1 = disabled, float format)
 param set-default MAN_ARM_GESTURE 0           # Manual arming gesture (0 = disabled)
 param set-default COM_OBL_RC_ACT 7            # Set offboard loss failsafe mode. (7 = disarm)
-param set-default COM_RC_IN_MODE 0	      # 0: RC Transmitter only. Fixes kill-switch not working on RC startup
+param set-default COM_RC_IN_MODE 0            # 0: RC Transmitter only. Fixes kill-switch not working on RC startup
