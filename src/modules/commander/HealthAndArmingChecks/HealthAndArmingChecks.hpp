@@ -122,7 +122,7 @@ private:
 	uORB::Subscription _leaf_health_sub{ORB_ID(leaf_health_events)};
 	leaf_health_events_s _leaf_last{};     // last seen message (optional)
 	hrt_abstime _leaf_last_ts{0};          // for freshness window
-	bool leafEventSet[4]={false,false,false,false};
+	bool leafEventSet[5]={false,false,false,false,false};
 
 	// all checks
 	AccelerometerChecks _accelerometer_checks;

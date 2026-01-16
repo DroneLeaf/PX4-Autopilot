@@ -96,6 +96,10 @@ void HealthAndArmingChecks::checkLeafHealth(Report &reporter)
 			leafEventSet[3]=_leaf_last.arguments[0];
 			break;
 
+		case LEAF_EVID("insufficient_memory"):
+			// PX4_INFO("Leaf insufficient_memory %" PRIu8,_leaf_last.arguments[0]);
+			leafEventSet[4]=_leaf_last.arguments[0];
+			break;
 		default:
 			break;
 
@@ -157,6 +161,21 @@ void HealthAndArmingChecks::checkLeafHealth(Report &reporter)
 		events::ID("misconfigured_rc"),
 		sev,
 		"RC not configured properly"
+		);
+	}
+
+	if (leafEventSet[4])
+	{
+		/* EVENT
+		* @description
+		* Insufficient LeafFC memory. <a href="https://fly.droneleaf.io/">Clear existing logs</a>
+		*/
+		reporter.armingCheckFailure(
+		NavModes::All,                   // affect all nav modes; tailor if needed
+		health_component_t::leaf,        // your custom component
+		events::ID("insufficient_memory"),
+		sev,
+		"Insufficient LeafFC memory"
 		);
 	}
 
