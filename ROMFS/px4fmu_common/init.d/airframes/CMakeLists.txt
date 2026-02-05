@@ -71,6 +71,7 @@ px4_add_romfs_files(
 	4500_clover4
 	4900_crazyflie
 	4901_crazyflie21
+	4950_leaf_generic
 	4951_hear_quad_ethernet_indoor
 	4952_hear_quad_telem_indoor
 	4953_hear_octa_ethernet_indoor
