@@ -83,6 +83,7 @@ if(gazebo_FOUND)
 		iris_obs_avoid
 		iris_opt_flow
 		iris_opt_flow_mockup
+		iris_light
 		iris_rplidar
 		iris_vision
 		omnicopter
